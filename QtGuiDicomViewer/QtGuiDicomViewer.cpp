@@ -6,23 +6,16 @@
 #include "DisplayImage.h"
 #include "DataSetReader.h"
 
-#if defined(QT_PRINTSUPPORT_LIB)
-#include <QtPrintSupport/qtprintsupportglobal.h>
-#if QT_CONFIG(printdialog)
-#include <QtPrintSupport/QPrintDialog>
-#endif
-#endif
-
 QtGuiDicomViewer::QtGuiDicomViewer(QWidget* parent)
 	: QMainWindow(parent)
-	  , cannyImage(new QLabel)
+	  , imageLabel(new QLabel)
 {
-	cannyImage->setBackgroundRole(QPalette::Base);
-	cannyImage->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-	cannyImage->setScaledContents(false);
-	cannyImage->installEventFilter(this);
+	imageLabel->setBackgroundRole(QPalette::Base);
+	imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+	imageLabel->setScaledContents(false);
+	imageLabel->installEventFilter(this);
 
-	setCentralWidget(cannyImage);
+	setCentralWidget(imageLabel);
 
 	createActions();
 
@@ -58,11 +51,8 @@ bool QtGuiDicomViewer::loadFiles(const QString& fileName)
 void QtGuiDicomViewer::updateImage()
 {
 	image = reader.cur();
-	cannyImage->setPixmap(QPixmap::fromImage(image));
-
-	updateActions();
-
-	cannyImage->adjustSize();
+	imageLabel->setPixmap(QPixmap::fromImage(image));
+	imageLabel->adjustSize();
 }
 
 bool QtGuiDicomViewer::saveFile(const QString& fileName)
@@ -141,26 +131,6 @@ void QtGuiDicomViewer::saveAs()
 	}
 }
 
-void QtGuiDicomViewer::print()
-{
-	//
-	//    Q_ASSERT(cannyImage->pixmap());
-	//#if QT_CONFIG(printdialog)
-	////! [6] //! [7]
-	//    QPrintDialog dialog(&printer, this);
-	////! [7] //! [8]
-	//    if (dialog.exec()) {
-	//        QPainter painter(&printer);
-	//        QRect rect = painter.viewport();
-	//        QSize size = cannyImage->pixmap()->size();
-	//        size.scale(rect.size(), Qt::KeepAspectRatio);
-	//        painter.setViewport(rect.x(), rect.y(), size.width(), size.height());
-	//        painter.setWindow(cannyImage->pixmap()->rect());
-	//        painter.drawPixmap(0, 0, *cannyImage->pixmap());
-	//    }
-	//#endif
-}
-
 void QtGuiDicomViewer::about()
 {
 	QMessageBox::about(this, tr("About Image Viewer"),
@@ -235,8 +205,4 @@ void QtGuiDicomViewer::createActions()
 	QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
 	helpMenu->addAction(tr("&About"), this, &QtGuiDicomViewer::about);
 	helpMenu->addAction(tr("About &Qt"), &QApplication::aboutQt);
-}
-
-void QtGuiDicomViewer::updateActions() const
-{
 }

@@ -23,19 +23,16 @@ private slots:
 	void open();
 	void openFolder();
 	void saveAs();
-	void print();
 	void about();
 
 private:
 	bool eventFilter(QObject* obj, QEvent* event) override;
 	void handleWheelEvent(QWheelEvent*);
 	void createActions();
-	void updateActions() const;
 	bool saveFile(const QString& fileName);
 	void updateImage();
 	DataSetReader reader;
 
-	QLabel* cannyImage;
-
+	QLabel* imageLabel;
 	QImage image;
 };

@@ -7,25 +7,59 @@
 #include <string>
 namespace fs = std::experimental::filesystem;
 
-static void apply_canny(cv::Mat img)
+static void remove_gray_threshold(cv::Mat img, int threshold = 220)
 {
 	return;
-	cv::Mat blured;
-	GaussianBlur(img, blured, cv::Size(3, 3), 1, 1);
-	const auto thld = 80;
-	Canny(blured, img, thld, 230, 3, true);
-	//cv::imshow("canny", canny);
-	//return QImage((uchar*)canny.data, canny.cols, canny.rows, canny.step, QImage::Format_Grayscale8);
-	//return std::make_shared<const QImage>((uchar*)img.data, img.cols, img.rows, img.step, QImage::Format_Grayscale8);
+	for (auto row = 0; row < img.rows; ++row)
+	{
+		for (auto col = 0; col < img.cols; ++col)
+		{
+			auto& x = img.at<uint8_t>(row, col);
+			if (x < threshold) x = 0;
+		}
+	}
+}
+
+static void remove_unwanted_edges(cv::Mat canny, cv::Mat original, int threshold = 170)
+{
+	auto const radius = 2;
+	for (auto row = radius; row < canny.rows - radius; ++row)
+	{
+		for (auto col = radius; col < canny.cols - radius; ++col)
+		{
+			auto& edge_pixel = canny.at<uint8_t>(row, col);
+			if (edge_pixel == 0) continue;
+			auto const to_remove = [&] {
+				auto count = 0;
+				for (auto mask_row = -radius; mask_row <= radius; ++mask_row)
+				{
+					for (auto mask_col = -radius; mask_col <= radius; ++mask_col)
+					{
+						auto const r = row + mask_row;
+						auto const c = col + mask_col;
+						if (original.at<uint8_t>(r, c) >= threshold)
+							count++;
+					}
+				}
+				// если поблизости есть несколько полезных пикселей
+				auto const area = (2 * radius + 1) * (2 * radius + 1);
+				return count < 2 * radius;
+			}();
+			if (to_remove)
+			{
+				edge_pixel = 0;
+			}
+		}
+	}
 }
 
 static cv::Mat canny(cv::Mat img)
 {
 	cv::Mat blured;
 	GaussianBlur(img, blured, cv::Size(3, 3), 1, 1);
-	const auto thld = 80;
-	Canny(blured, blured, thld, 230, 3, true);
-	return std::move(blured);
+	const auto thld = 100;
+	Canny(blured, blured, thld, 180, 3, true);
+	return blured;
 }
 
 static cv::Mat bytes_to_mat(std::vector<char>& bytes, const int width, const int height)
@@ -52,20 +86,15 @@ static int32_t read_tag(const imebra::DataSet* dataset, const imebra::tagId_t& t
 static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 {
 	std::unique_ptr<imebra::Image> image(loadedDataSet->getImageApplyModalityTransform(0));
-
 	std::string colorSpace = image->getColorSpace();
-
 	const auto width = image->getWidth();
 	const auto height = image->getHeight();
-
 	imebra::TransformsChain chain;
 
 	if (imebra::ColorTransformsFactory::isMonochrome(colorSpace))
 	{
 		imebra::VOILUT voilutTransform;
-
 		imebra::vois_t vois = loadedDataSet->getVOIs();
-
 		std::vector<std::unique_ptr<imebra::LUT>> luts;
 		//for (size_t scanLUTs(0); ; ++scanLUTs)
 		//{
@@ -92,15 +121,15 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 		{
 			voilutTransform.applyOptimalVOI(*image, 0, 0, width, height);
 		}
-
+		//voilutTransform.setCenterWidth(300, 1500);
 		chain.addTransform(voilutTransform);
 	}
 
 	imebra::DrawBitmap draw{chain};
-
+	
 	// Ask for the size of the buffer (in bytes)
 	const size_t requestedBufferSize = draw.getBitmap(*image, imebra::drawBitmapType_t::drawBitmapRGBA, 4, nullptr, 0);
-
+	
 	// Now we allocate the buffer and then ask DrawBitmap to fill it
 	std::vector<char> buffer(requestedBufferSize, 0);
 	draw.getBitmap(*image, imebra::drawBitmapType_t::drawBitmapRGBA, 4,
@@ -108,11 +137,11 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 	auto mat = bytes_to_mat(buffer, width, height);
 	if (mat.empty())
 	{
-		std::cout << "Can't open an image\n";
+		std::cout << "Can't open an qimage\n";
 		std::cin.get();
 		return {};
 	}
-	apply_canny(mat);
+	//remove_gray_threshold(mat);
 	return mat;
 }
 

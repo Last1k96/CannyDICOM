@@ -44,7 +44,7 @@ static std::wstring read_tag(const imebra::DataSet& dataset, const imebra::tagId
 
 static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 {
-	// Retrieve the first image (index = 0)
+	// Retrieve the first qimage (index = 0)
 	std::unique_ptr<imebra::Image> image(loadedDataSet->getImageApplyModalityTransform(0));
 
 	// Get the color space
@@ -56,7 +56,7 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 	const auto height = image->getHeight();
 
 	// The transforms chain will contain all the transform that we want to
-	// apply to the image before displaying it
+	// apply to the qimage before displaying it
 	imebra::TransformsChain chain;
 
 	if (imebra::ColorTransformsFactory::isMonochrome(colorSpace))
@@ -99,8 +99,8 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 		chain.addTransform(voilutTransform);
 	}
 
-	// If the image is monochromatic then now chain contains the VOILUT transform
-	// We create a DrawBitmap that always apply the chain transform before getting the RGB image
+	// If the qimage is monochromatic then now chain contains the VOILUT transform
+	// We create a DrawBitmap that always apply the chain transform before getting the RGB qimage
 	imebra::DrawBitmap draw{chain};
 
 	// Ask for the size of the buffer (in bytes)
@@ -113,7 +113,7 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 	auto mat = bytes_to_mat(buffer, width, height);
 	if (mat.empty())
 	{
-		std::cout << "Can't open an image\n";
+		std::cout << "Can't open an qimage\n";
 		std::cin.get();
 		return {};
 	}

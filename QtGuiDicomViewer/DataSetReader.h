@@ -8,8 +8,8 @@ class DataSetReader
 {
 	std::vector<cv::Mat> image_vec{};
 	int cur_image_index{0};
-	QImage image{};
-	QImage original{};
+	cv::Mat mimage{};
+	QImage qimage{};
 	std::string error{};
 
 	void advance(int count);

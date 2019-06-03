@@ -26,7 +26,7 @@ QtGuiDicomViewer::QtGuiDicomViewer(QWidget* parent)
 
 	createActions();
 
-	resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
+	resize(QGuiApplication::primaryScreen()->availableSize() * 4 / 5);
 }
 
 bool QtGuiDicomViewer::loadFiles(const QString& fileName)
@@ -105,7 +105,7 @@ static void initializeImageFileDialog(QFileDialog& dialog, QFileDialog::AcceptMo
 		mimeTypeFilters.append(mimeTypeName);
 	mimeTypeFilters.sort();
 	//dialog.setMimeTypeFilters(mimeTypeFilters);
-	//dialog.selectMimeTypeFilter("image/jpeg");
+	//dialog.selectMimeTypeFilter("qimage/jpeg");
 	if (acceptMode == QFileDialog::AcceptSave)
 		dialog.setDefaultSuffix("jpg");
 }
@@ -124,7 +124,7 @@ void QtGuiDicomViewer::openFolder()
 {
 	// TODO change to c:/
 	QString dir = QFileDialog::getExistingDirectory(nullptr, QObject::tr("Open Directory"),
-	                                                "d:/DICOM/Lukin-after1operation/DICOM/D201111/DD1111",
+	                                                "d:/DICOM/Latishev-after1operation/DICOM",
 	                                                QFileDialog::ShowDirsOnly
 	                                                | QFileDialog::DontResolveSymlinks);
 	if (dir.size() == 0) return;
@@ -165,8 +165,8 @@ void QtGuiDicomViewer::about()
 {
 	QMessageBox::about(this, tr("About Image Viewer"),
 	                   tr("<p>The <b>Image Viewer</b> example shows how to combine QLabel "
-		                   "and QScrollArea to display an image-> QLabel is typically used "
-		                   "for displaying a text, but it can also display an image-> "
+		                   "and QScrollArea to display an qimage-> QLabel is typically used "
+		                   "for displaying a text, but it can also display an qimage-> "
 		                   "QScrollArea provides a scrolling view around another widget. "
 		                   "If the child widget exceeds the size of the frame, QScrollArea "
 		                   "automatically provides scroll bars. </p><p>The example "
@@ -175,7 +175,7 @@ void QtGuiDicomViewer::about()
 		                   "automatically resize its contents "
 		                   "(QScrollArea::widgetResizable), can be used to implement "
 		                   "zooming and scaling features. </p><p>In addition the example "
-		                   "shows how to use QPainter to print an image-></p>"));
+		                   "shows how to use QPainter to print an qimage-></p>"));
 }
 
 bool QtGuiDicomViewer::eventFilter(QObject* obj, QEvent* event)

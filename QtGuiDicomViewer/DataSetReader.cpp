@@ -11,8 +11,11 @@ QImage DataSetReader::mat_to_qimage(cv::Mat img)
 void DataSetReader::advance(int const count)
 {
 	cur_image_index = (cur_image_index + image_vec.size() + count) % image_vec.size();
-	image = mat_to_qimage(canny(image_vec[cur_image_index]));
-	original = mat_to_qimage(image_vec[cur_image_index]);
+	const auto original = image_vec[cur_image_index];
+	auto edges = canny(original);
+	remove_unwanted_edges(edges, original);
+	cv::hconcat(original, edges, mimage);
+	qimage = mat_to_qimage(mimage);
 }
 
 void DataSetReader::update()
@@ -58,7 +61,7 @@ void DataSetReader::prev(int const count = 1)
 
 QImage DataSetReader::cur() const
 {
-	return image;
+	return qimage;
 }
 
 bool DataSetReader::empty() const

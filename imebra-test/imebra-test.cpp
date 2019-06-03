@@ -67,7 +67,7 @@ int main(int argc, const char* argv[])
 
 	std::cout << "getChannelsNumber " << image->getChannelsNumber() << '\n'
 		<< "getColorSpace " << image->getColorSpace() << '\n'
-		//<< "getDepth " << image->getDepth() << '\n'
+		//<< "getDepth " << qimage->getDepth() << '\n'
 		<< "getHeight " << image->getHeight() << '\n'
 		<< "getHeightMm " << image->getHeightMm() << '\n'
 		<< "getWidth " << image->getWidth() << '\n'

@@ -52,8 +52,8 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 
 	// Get the size in pixels
 
-	const auto width = image->getWidth();
-	const auto height = image->getHeight();
+	auto const width = image->getWidth();
+	auto const height = image->getHeight();
 
 	// The transforms chain will contain all the transform that we want to
 	// apply to the qimage before displaying it
@@ -128,7 +128,7 @@ static void sort_by_instance_number(std::vector<std::unique_ptr<imebra::DataSet>
 		auto tag = read_tag(*data, imebra::tagId_t::InstanceNumber_0020_0013);
 		return std::make_pair(tag, data.release());
 	});
-	std::stable_sort(sorted.begin(), sorted.end(), [](const auto& l, const auto& r)
+	std::stable_sort(sorted.begin(), sorted.end(), [](auto const& l, auto const& r)
 	{
 		return l.first < r.first;
 	});
@@ -144,7 +144,7 @@ static std::vector<std::unique_ptr<imebra::DataSet>> read_folder(const std::wstr
 {
 	std::vector<std::unique_ptr<imebra::DataSet>> dicom_dataset{};
 
-	for (const auto& entry : fs::directory_iterator(path))
+	for (auto const& entry : fs::directory_iterator(path))
 	{
 		try
 		{
@@ -170,7 +170,7 @@ static void display_folder(std::wstring const& path)
 //static std::vector<cv::Mat> read_folder(const std::wstirng& path)
 //{
 //	std::vector<std::unique_ptr<imebra::DataSet>> dicom_dataset{};
-//	for (const auto& entry : fs::directory_iterator(path))
+//	for (auto const& entry : fs::directory_iterator(path))
 //	{
 //		try
 //		{
@@ -195,7 +195,7 @@ static std::vector<cv::Mat> dataset_to_images(const std::vector<std::unique_ptr<
 	auto result = std::vector<cv::Mat>{};
 	result.reserve(set.size());
 
-	std::transform(set.begin(), set.end(), std::back_inserter(result), [&](const auto& dataset)
+	std::transform(set.begin(), set.end(), std::back_inserter(result), [&](auto const& dataset)
 	{
 		return get_image(dataset.get());
 	});
@@ -218,25 +218,25 @@ namespace std
 }
 
 [[nodiscard]]
-static std::set<std::wstring> get_tags_union(const std::vector<imebra::DataSet*>& datasets)
+static std::set<std::wstring> get_tags_union(std::vector<std::unique_ptr<imebra::DataSet>> const& datasets)
 {
-	auto previous_set = std::set<std::wstring>{};
 	auto union_difference = std::set<std::wstring>{};
-	for (const auto& dataset : datasets)
+	for (auto const& dataset : datasets)
 	{
 		auto current_set = std::set<std::wstring>{};
-		for (const auto& tag : dataset->getTags())
+		for (auto const& tag : dataset->getTags())
 		{
-			const auto tag_string = tag_to_wstring(tag);
-			const auto tag_value = [&]
-			{
-				return dataset->getUnicodeString(tag, 0, L"");
-			}();
-			current_set.insert(tag_string + L"\t" + tag_value);
+			auto const tag_string = tag_to_wstring(tag);
+			auto const tag_name = imebra::DicomDictionary::getUnicodeTagName(tag);
+			//auto const tag_value = [&]
+			//{
+			//	return dataset->getUnicodeString(tag, 0, L"");
+			//}();
+			current_set.insert(tag_string +L"\t" + tag_name);
 		}
 		auto current_difference = std::set<std::wstring>{};
 
-		std::set_symmetric_difference(previous_set.begin(), previous_set.end(),
+		std::set_symmetric_difference(union_difference.begin(), union_difference.end(),
 		                              current_set.begin(), current_set.end(),
 		                              std::inserter(current_difference, current_difference.end()));
 		std::set_union(current_difference.begin(), current_difference.end(),
@@ -248,7 +248,7 @@ static std::set<std::wstring> get_tags_union(const std::vector<imebra::DataSet*>
 
 std::vector<std::wstring> get_tags(const imebra::DataSet& dataset)
 {
-	const auto tags = dataset.getTags();
+	auto const tags = dataset.getTags();
 	auto tag_names = std::vector<std::wstring>{};
 	tag_names.reserve(tags.size());
 	std::transform(tags.begin(), tags.end(), std::back_inserter(tag_names), [&](const imebra::TagId& tag)
@@ -261,8 +261,8 @@ std::vector<std::wstring> get_tags(const imebra::DataSet& dataset)
 std::set<std::wstring> different_tag_values(const imebra::DataSet& set1, const imebra::DataSet& set2)
 {
 	auto different_values = std::set<std::wstring>{};
-	const auto tags1 = get_tags(set1);
-	const auto tags2 = get_tags(set2);
+	auto const tags1 = get_tags(set1);
+	auto const tags2 = get_tags(set2);
 	std::set_symmetric_difference(tags1.begin(), tags1.end(), tags2.begin(), tags2.end(),
 	                              std::inserter(different_values, different_values.end()));
 	return different_values;
@@ -283,18 +283,18 @@ static void print_series_tag_difference()
 	}
 }
 
-static void print_series_tag_union()
-{
-	std::wstring const path1 = L"d:\\DICOM\\Kalinin-before\\DICOM\\00000";
-	std::wstring const path2 = L"d:\\DICOM\\Kalinin-before\\DICOM\\00617";
-	//	std::wstring const path1 = L"d:\\korotkov\\DICOM\\17020708\\29510000\\80520630.dcm";
-	//	std::wstring const path2 = L"d:\\korotkov\\DICOM\\17020708\\29510000\\80529459.dcm";
-	auto set1 = imebra::CodecFactory::load(path1);
-	auto set2 = imebra::CodecFactory::load(path2);
-
-	auto const diff = get_tags_union({set1, set2});
-	for (auto const& tag : diff)
-	{
-		std::wcout << tag << '\n';
-	}
-}
+//static void print_series_tag_union()
+//{
+//	std::wstring const path1 = L"d:\\DICOM\\Kalinin-before\\DICOM\\00000";
+//	std::wstring const path2 = L"d:\\DICOM\\Kalinin-before\\DICOM\\00617";
+//	//	std::wstring const path1 = L"d:\\korotkov\\DICOM\\17020708\\29510000\\80520630.dcm";
+//	//	std::wstring const path2 = L"d:\\korotkov\\DICOM\\17020708\\29510000\\80529459.dcm";
+//	auto set1 = imebra::CodecFactory::load(path1);
+//	auto set2 = imebra::CodecFactory::load(path2);
+//
+//	auto const diff = get_tags_union({set1, set2});
+//	for (auto const& tag : diff)
+//	{
+//		std::wcout << tag << '\n';
+//	}
+//}

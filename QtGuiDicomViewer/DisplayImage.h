@@ -57,7 +57,7 @@ static cv::Mat canny(cv::Mat img)
 {
 	cv::Mat blured;
 	GaussianBlur(img, blured, cv::Size(3, 3), 1, 1);
-	const auto thld = 100;
+	auto const thld = 100;
 	Canny(blured, blured, thld, 180, 3, true);
 	return blured;
 }
@@ -74,7 +74,7 @@ static int32_t read_tag(const imebra::DataSet* dataset, const imebra::tagId_t& t
 {
 	try
 	{
-		const auto tagId = imebra::TagId(tag);
+		auto const tagId = imebra::TagId(tag);
 		return dataset->getSignedLong(tagId, 0);
 	}
 	catch (...)
@@ -87,8 +87,8 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 {
 	std::unique_ptr<imebra::Image> image(loadedDataSet->getImageApplyModalityTransform(0));
 	std::string colorSpace = image->getColorSpace();
-	const auto width = image->getWidth();
-	const auto height = image->getHeight();
+	auto const width = image->getWidth();
+	auto const height = image->getHeight();
 	imebra::TransformsChain chain;
 
 	if (imebra::ColorTransformsFactory::isMonochrome(colorSpace))
@@ -147,7 +147,7 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 
 static cv::Mat read_file(const std::wstring& path)
 {
-	const auto loaded_dataset = std::unique_ptr<imebra::DataSet>(imebra::CodecFactory::load(path));
+	auto const loaded_dataset = std::unique_ptr<imebra::DataSet>(imebra::CodecFactory::load(path));
 	return get_image(loaded_dataset.get());
 }
 
@@ -164,7 +164,7 @@ static void sort_datasets_by_tagid(std::vector<std::unique_ptr<imebra::DataSet>>
 		auto tag = read_tag(data.get(), tagId);
 		return std::make_pair(tag, data.release());
 	});
-	std::stable_sort(sorted.begin(), sorted.end(), [](const auto& l, const auto& r)
+	std::stable_sort(sorted.begin(), sorted.end(), [](auto const& l, auto const& r)
 	{
 		return l.first < r.first;
 	});
@@ -179,7 +179,7 @@ static void sort_datasets_by_tagid(std::vector<std::unique_ptr<imebra::DataSet>>
 //static std::vector<cv::Mat> read_folder(std::wstring_view path)
 //{
 //	std::vector<std::unique_ptr<imebra::DataSet>> dicom_dataset{};
-//	for (const auto& entry : fs::directory_iterator(path))
+//	for (auto const& entry : fs::directory_iterator(path))
 //	{
 //		try
 //		{
@@ -244,7 +244,7 @@ static std::vector<cv::Mat> dataset_to_images(const std::vector<std::unique_ptr<
 	result.reserve(set.size());
 
 	std::transform(set.begin(), set.end(), std::back_inserter(result),
-	               [&](const auto& dataset)
+	               [&](auto const& dataset)
 	               {
 		               return get_image(dataset.get());
 	               });

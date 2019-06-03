@@ -56,7 +56,7 @@ static cv::Mat canny(cv::Mat img)
 {
 	cv::Mat blured;
 	GaussianBlur(img, blured, cv::Size(3, 3), 1, 1);
-	const auto thld = 100;
+	auto const thld = 100;
 	Canny(blured, blured, thld, 180, 3, true);
 	return blured;
 }

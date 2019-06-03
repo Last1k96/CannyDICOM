@@ -11,8 +11,8 @@ QImage DataSetReader::mat_to_qimage(cv::Mat img)
 void DataSetReader::advance(int const count)
 {
 	cur_image_index = (cur_image_index + image_vec.size() + count) % image_vec.size();
-	const auto original = image_vec[cur_image_index];
-	auto edges = canny(original);
+	auto const original = image_vec[cur_image_index];
+	auto const edges = canny(original);
 	remove_unwanted_edges(edges, original);
 	cv::hconcat(original, edges, mimage);
 	qimage = mat_to_qimage(mimage);

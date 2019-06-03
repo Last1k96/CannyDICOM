@@ -9,6 +9,7 @@ Q_OBJECT
 
 public:
 	Canny3D(QWidget* parent = Q_NULLPTR);
+	bool loadFiles(const QString&);
 
 private:
 	Ui::Canny3DClass ui;

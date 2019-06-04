@@ -9,6 +9,7 @@ Canny3D::Canny3D(QWidget* parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
+	//connect(ui.horizontalSlider, &QSlider::valueChanged, ui.progressBar, &QProgressBar::setValue);
 }
 
 bool Canny3D::loadFiles(const QString& fileName)
@@ -60,20 +61,6 @@ void Canny3D::initializeImageFileDialog(QFileDialog& dialog, QFileDialog::Accept
 		dialog.setDefaultSuffix("jpg");
 }
 
-void Canny3D::createActions()
-{
-	QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
-
-	QAction* openAct = fileMenu->addAction(tr("&Open..."), this, &Canny3D::open);
-	openAct->setShortcut(QKeySequence::Open);
-
-	QAction* openFolderAct = fileMenu->addAction(tr("Open &folder..."), this, &Canny3D::openFolder);
-
-	fileMenu->addSeparator();
-
-	QAction* exitAct = fileMenu->addAction(tr("E&xit"), this, &QWidget::close);
-	exitAct->setShortcut(tr("Ctrl+Q"));
-}
 
 void Canny3D::updateImage()
 {

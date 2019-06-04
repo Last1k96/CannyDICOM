@@ -5,6 +5,7 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
+
 static cv::Mat bytes_to_mat(std::vector<char> bytes, const int width, const int height)
 {
 	return cv::Mat(height, width, CV_8UC4, &bytes[0]).clone(); // make a copy
@@ -298,3 +299,34 @@ static void print_series_tag_difference()
 //		std::wcout << tag << '\n';
 //	}
 //}
+
+
+static void check_all()
+{
+
+	std::vector<std::wstring> paths = {
+		L"d:/DICOM/Panasenko/DICOM",
+		L"d:/DICOM/Prohorov-after/DICOM/D201504/DD2409",
+		L"d:/DICOM/Kalinin-before/DICOM",
+		L"d:/DICOM/korotkov/DICOM/17020708/29510000",
+		L"d:/DICOM/korotkov/DICOM/17020708/29510001",
+		L"d:/DICOM/Krupin-before/DICOM/D201508/DD1014",
+		L"d:/DICOM/Latishev-after1operation/DICOM",
+		L"d:/DICOM/Latishev-after2operation-CBCT/Data",
+		L"d:/DICOM/Lukin-after1operation/DICOM/D201111/DD1111",
+		L"d:/DICOM/Lukin-after2operation/DICOM/D201211/DD1512"
+	};
+	for (auto const& path : paths)
+	{
+		std::wcout << path << '\n';
+		auto const sets = read_folder(path);
+		for (auto const& set : sets)
+		{
+			if (auto tag_val = read_tag(*set, imebra::tagId_t::VOILUTSequence_0028_3010); !tag_val.empty())
+			{
+				std::wcout << tag_val << '\n';
+			}
+		}
+
+	}
+}

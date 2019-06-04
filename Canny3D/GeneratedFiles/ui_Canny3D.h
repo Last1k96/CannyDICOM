@@ -10,10 +10,12 @@
 #define UI_CANNY3D_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QTabWidget>
@@ -26,6 +28,9 @@ QT_BEGIN_NAMESPACE
 class Ui_Canny3DClass
 {
 public:
+    QAction *action;
+    QAction *action_2;
+    QAction *action_4;
     QWidget *centralWidget;
     QHBoxLayout *horizontalLayout;
     QSplitter *splitter;
@@ -34,14 +39,21 @@ public:
     QWidget *tab;
     QWidget *tab_2;
     QMenuBar *menuBar;
+    QMenu *menu;
     QToolBar *mainToolBar;
 
     void setupUi(QMainWindow *Canny3DClass)
     {
         if (Canny3DClass->objectName().isEmpty())
             Canny3DClass->setObjectName(QString::fromUtf8("Canny3DClass"));
-        Canny3DClass->resize(811, 580);
+        Canny3DClass->resize(572, 368);
         Canny3DClass->setBaseSize(QSize(800, 600));
+        action = new QAction(Canny3DClass);
+        action->setObjectName(QString::fromUtf8("action"));
+        action_2 = new QAction(Canny3DClass);
+        action_2->setObjectName(QString::fromUtf8("action_2"));
+        action_4 = new QAction(Canny3DClass);
+        action_4->setObjectName(QString::fromUtf8("action_4"));
         centralWidget = new QWidget(Canny3DClass);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         QSizePolicy sizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
@@ -86,11 +98,19 @@ public:
         Canny3DClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(Canny3DClass);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 811, 21));
+        menuBar->setGeometry(QRect(0, 0, 572, 21));
+        menu = new QMenu(menuBar);
+        menu->setObjectName(QString::fromUtf8("menu"));
         Canny3DClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(Canny3DClass);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
         Canny3DClass->addToolBar(Qt::TopToolBarArea, mainToolBar);
+
+        menuBar->addAction(menu->menuAction());
+        menu->addAction(action);
+        menu->addAction(action_2);
+        menu->addSeparator();
+        menu->addAction(action_4);
 
         retranslateUi(Canny3DClass);
 
@@ -100,8 +120,12 @@ public:
     void retranslateUi(QMainWindow *Canny3DClass)
     {
         Canny3DClass->setWindowTitle(QApplication::translate("Canny3DClass", "Canny3D", nullptr));
+        action->setText(QApplication::translate("Canny3DClass", "\320\236\321\202\320\272\321\200\321\213\321\202\321\214", nullptr));
+        action_2->setText(QApplication::translate("Canny3DClass", "\320\236\321\202\320\272\321\200\321\213\321\202\321\214 \320\277\320\260\320\277\320\272\321\203", nullptr));
+        action_4->setText(QApplication::translate("Canny3DClass", "\320\222\321\213\321\205\320\276\320\264", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("Canny3DClass", "Tab 1", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("Canny3DClass", "Tab 2", nullptr));
+        menu->setTitle(QApplication::translate("Canny3DClass", "\320\244\320\260\320\271\320\273", nullptr));
     } // retranslateUi
 
 };

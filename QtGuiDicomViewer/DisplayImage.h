@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <QImage>
 #include <string>
+#include <optional>
 namespace fs = std::experimental::filesystem;
 
 static void remove_gray_threshold(cv::Mat img, int threshold = 220)
@@ -29,7 +30,8 @@ static void remove_unwanted_edges(cv::Mat canny, cv::Mat original, int threshold
 		{
 			auto& edge_pixel = canny.at<uint8_t>(row, col);
 			if (edge_pixel == 0) continue;
-			auto const to_remove = [&] {
+			auto const to_remove = [&]
+			{
 				auto count = 0;
 				for (auto mask_row = -radius; mask_row <= radius; ++mask_row)
 				{
@@ -83,72 +85,73 @@ static int32_t read_tag(const imebra::DataSet* dataset, const imebra::tagId_t& t
 	return {};
 }
 
-static cv::Mat get_image(imebra::DataSet* loadedDataSet)
+struct VOI
 {
-	std::unique_ptr<imebra::Image> image(loadedDataSet->getImageApplyModalityTransform(0));
-	std::string colorSpace = image->getColorSpace();
-	auto const width = image->getWidth();
-	auto const height = image->getHeight();
+	double center;
+	double width;
+};
+
+struct ImebraImage
+{
+	std::shared_ptr<imebra::Image const> image{};
+	std::optional<VOI> voi;
+};
+
+static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> voi = {})
+{
+	auto const width = data.image->getWidth();
+	auto const height = data.image->getHeight();
+
 	imebra::TransformsChain chain;
-
-	if (imebra::ColorTransformsFactory::isMonochrome(colorSpace))
+	imebra::VOILUT voilutTransform;
+	
+	if (voi)
 	{
-		imebra::VOILUT voilutTransform;
-		imebra::vois_t vois = loadedDataSet->getVOIs();
-		std::vector<std::unique_ptr<imebra::LUT>> luts;
-		//for (size_t scanLUTs(0); ; ++scanLUTs)
-		//{
-		//	try
-		//	{
-		//		luts.emplace_back(
-		//			loadedDataSet->getLUT(imebra::TagId(imebra::tagId_t::VOILUTSequence_0028_3010), scanLUTs));
-		//	}
-		//	catch (const imebra::MissingDataElementError&)
-		//	{
-		//		break;
-		//	}
-		//}
-
-		if (!vois.empty())
-		{
-			voilutTransform.setCenterWidth(vois[0].center, vois[0].width);
-		}
-			//else if (!luts.empty())
-			//{
-			//	voilutTransform.setLUT(*(luts.front().get()));
-			//}
-		else
-		{
-			voilutTransform.applyOptimalVOI(*image, 0, 0, width, height);
-		}
-		//voilutTransform.setCenterWidth(300, 1500);
-		chain.addTransform(voilutTransform);
+		voilutTransform.setCenterWidth(voi->center, voi->width);
 	}
+	else if (data.voi)
+	{
+		voilutTransform.setCenterWidth(data.voi->center, data.voi->width);
+	}
+	else 
+	{
+		voilutTransform.applyOptimalVOI(*data.image, 0, 0, width, height);
+	}
+	chain.addTransform(voilutTransform);
 
 	imebra::DrawBitmap draw{chain};
-	
-	// Ask for the size of the buffer (in bytes)
-	const size_t requestedBufferSize = draw.getBitmap(*image, imebra::drawBitmapType_t::drawBitmapRGBA, 4, nullptr, 0);
-	
-	// Now we allocate the buffer and then ask DrawBitmap to fill it
-	std::vector<char> buffer(requestedBufferSize, 0);
-	draw.getBitmap(*image, imebra::drawBitmapType_t::drawBitmapRGBA, 4,
-	               reinterpret_cast<char*>(&buffer.at(0)), requestedBufferSize);
-	auto mat = bytes_to_mat(buffer, width, height);
-	if (mat.empty())
-	{
-		std::cout << "Can't open an qimage\n";
-		std::cin.get();
-		return {};
-	}
-	//remove_gray_threshold(mat);
-	return mat;
+
+	const auto buffer_size = draw.getBitmap(*data.image, 
+		imebra::drawBitmapType_t::drawBitmapRGBA, 4, nullptr, 0);
+
+	std::vector<char> buffer(buffer_size, 0);
+	draw.getBitmap(*data.image, imebra::drawBitmapType_t::drawBitmapRGBA, 4,
+	               reinterpret_cast<char*>(&buffer.at(0)), buffer_size);
+
+	return bytes_to_mat(buffer, width, height);;
 }
 
-static cv::Mat read_file(const std::wstring& path)
+static ImebraImage get_image(imebra::DataSet* loadedDataSet)
 {
-	auto const loaded_dataset = std::unique_ptr<imebra::DataSet>(imebra::CodecFactory::load(path));
-	return get_image(loaded_dataset.get());
+	ImebraImage result;
+	result.image = std::shared_ptr<imebra::Image>(loadedDataSet->getImage(0));
+	if (!imebra::ColorTransformsFactory::isMonochrome(result.image->getColorSpace()))
+	{
+		throw std::runtime_error("Image must be monochrome.");
+	}
+
+	auto vois = loadedDataSet->getVOIs();
+	if (!vois.empty())
+	{
+		result.voi = VOI{vois[0].center, vois[0].width};
+	}
+
+	return result;
+}
+
+static std::unique_ptr<imebra::DataSet> read_file(const std::wstring& path)
+{
+	return std::unique_ptr<imebra::DataSet>(imebra::CodecFactory::load(path));
 }
 
 static std::wstring sv(const QString& s)
@@ -227,20 +230,19 @@ static std::vector<std::unique_ptr<imebra::DataSet>> read_folder(const std::wstr
 		{
 		}
 	}
-	//sort_datasets_by_tagid(dicom_dataset, imebra::tagId_t::SeriesNumber_0020_0011);
+	sort_datasets_by_tagid(dicom_dataset, imebra::tagId_t::SeriesNumber_0020_0011);
 	//sort_datasets_by_tagid(dicom_dataset, imebra::tagId_t::ConvolutionKernel_0018_1210);
 	//sort_datasets_by_tagid(dicom_dataset, imebra::tagId_t::SliceLocation_0020_1041);
 	//sort_datasets_by_tagid(dicom_dataset, imebra::tagId_t::SeriesTime_0008_0031);
 	//sort_datasets_by_tagid(dicom_dataset, imebra::tagId_t::SeriesDate_0008_0021);
-	sort_datasets_by_tagid(dicom_dataset, imebra::tagId_t::SeriesInstanceUID_0020_000E);
 
 
 	return dicom_dataset;
 }
 
-static std::vector<cv::Mat> dataset_to_images(const std::vector<std::unique_ptr<imebra::DataSet>>& set)
+static std::vector<ImebraImage> dataset_to_images(const std::vector<std::unique_ptr<imebra::DataSet>>& set)
 {
-	auto result = std::vector<cv::Mat>{};
+	auto result = std::vector<ImebraImage>{};
 	result.reserve(set.size());
 
 	std::transform(set.begin(), set.end(), std::back_inserter(result),

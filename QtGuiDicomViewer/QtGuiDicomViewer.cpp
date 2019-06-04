@@ -10,6 +10,7 @@ QtGuiDicomViewer::QtGuiDicomViewer(QWidget* parent)
 	: QMainWindow(parent)
 	  , imageLabel(new QLabel)
 {
+	QWidget w{};
 	imageLabel->setBackgroundRole(QPalette::Base);
 	imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 	imageLabel->setScaledContents(false);

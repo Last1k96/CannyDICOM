@@ -31,23 +31,23 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\CannyImageViewer.cpp">
+    <ClCompile Include="QtImageViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Src\CannyImageViewerPlugin.cpp">
+    <ClCompile Include="QtImageViewerPlugin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="Src\CannyImageViewer.h">
+    <QtMoc Include="QtImageViewer.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="Src\CannyImageViewerPlugin.h">
+    <QtMoc Include="QtImageViewerPlugin.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cannyimageviewerplugin.json">
+    <None Include="qtimageviewerplugin.json">
       <Filter>Other Files</Filter>
     </None>
   </ItemGroup>

@@ -2,14 +2,14 @@
 
 #include <QtUiPlugin/QDesignerCustomWidgetInterface>
 
-class CannyImageViewerPlugin : public QObject, public QDesignerCustomWidgetInterface
+class QtImageViewerPlugin : public QObject, public QDesignerCustomWidgetInterface
 {
 	Q_OBJECT
-	Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface" FILE "cannyimageviewerplugin.json")
+	Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetInterface" FILE "qtimageviewerplugin.json")
 	Q_INTERFACES(QDesignerCustomWidgetInterface)
 
 public:
-	CannyImageViewerPlugin(QObject *parent = Q_NULLPTR);
+	QtImageViewerPlugin(QObject *parent = Q_NULLPTR);
 
 	bool isContainer() const;
 	bool isInitialized() const;

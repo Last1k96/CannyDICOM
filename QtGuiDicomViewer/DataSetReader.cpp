@@ -11,10 +11,10 @@ QImage DataSetReader::mat_to_qimage(cv::Mat img)
 void DataSetReader::advance(int const count)
 {
 	cur_image_index = (cur_image_index + image_vec.size() + count) % image_vec.size();
-	auto const original = image_vec[cur_image_index];
+	auto const original = applyVoilutTransform(image_vec[cur_image_index]);
 	auto const edges = canny(original);
 	remove_unwanted_edges(edges, original);
-	cv::hconcat(original, edges, mimage);
+	hconcat(original, edges, mimage);
 	qimage = mat_to_qimage(mimage);
 }
 
@@ -30,7 +30,7 @@ DataSetReader::DataSetReader(std::filesystem::path path)
 	{
 		if (is_regular_file(path))
 		{
-			image_vec.push_back(read_file(path));
+			image_vec.push_back(get_image(read_file(path).get()));
 		}
 		else if (is_directory(path))
 		{

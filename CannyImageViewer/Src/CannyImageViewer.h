@@ -7,5 +7,6 @@ class CannyImageViewer : public QWidget
 	Q_OBJECT
 
 public:
-	CannyImageViewer(QWidget *parent = Q_NULLPTR);
+	explicit CannyImageViewer(QWidget *parent = Q_NULLPTR);
+	void paintEvent(QPaintEvent* event) override;
 };

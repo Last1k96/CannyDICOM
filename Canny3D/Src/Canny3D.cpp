@@ -2,28 +2,29 @@
 #include <qfiledialog.h>
 #include <qimagereader.h>
 #include <qimagewriter.h>
-#include "DataSetReaderCanny.h"
+#include "DataSetReader.h"
 #include <qmessagebox.h>
+#include <QAction>
 
 Canny3D::Canny3D(QWidget* parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
-	//connect(ui.horizontalSlider, &QSlider::valueChanged, ui.progressBar, &QProgressBar::setValue);
+	connect(ui.openAction, &QAction::triggered, this, &Canny3D::open);
+	connect(ui.openFolderAction, &QAction::triggered, this, &Canny3D::openFolder);
 }
 
 bool Canny3D::loadFiles(const QString& fileName)
 {
-	//QImageReader reader(fileName);
-	//reader.setAutoTransform(true);
-	reader = DataSetReader(fileName.toStdWString());
-
-	if (reader.empty())
+	try {
+		reader.loadData(fileName.toStdWString());
+	}
+	catch (std::exception& e)
 	{
 		QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
 			tr("Cannot load %1: %2")
 			.arg(QDir::toNativeSeparators(fileName),
-				QString::fromStdString(reader.errorString())));
+				QString::fromStdString(e.what())));
 		return false;
 	}
 
@@ -55,8 +56,6 @@ void Canny3D::initializeImageFileDialog(QFileDialog& dialog, QFileDialog::Accept
 	foreach(const QByteArray & mimeTypeName, supportedMimeTypes)
 		mimeTypeFilters.append(mimeTypeName);
 	mimeTypeFilters.sort();
-	//dialog.setMimeTypeFilters(mimeTypeFilters);
-	//dialog.selectMimeTypeFilter("qimage/jpeg");
 	if (acceptMode == QFileDialog::AcceptSave)
 		dialog.setDefaultSuffix("jpg");
 }

@@ -39,7 +39,7 @@
     <ClCompile Include="Src\QGLMeshViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Src\DataSetReaderCanny.cpp">
+    <ClCompile Include="Src\DataSetReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -52,6 +52,9 @@
     <QtMoc Include="Src\Canny3D.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="Src\DataSetReader.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="Qt\Canny3D.qrc">
@@ -62,10 +65,7 @@
     <ClInclude Include="Src\QGLMeshViewer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Src\DisplayImageCanny.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\DataSetReaderCanny.h">
+    <ClInclude Include="Src\DisplayImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -174,7 +174,7 @@ void QtGuiDicomViewer::handleWheelEvent(QWheelEvent* e)
 		reader.next(k);
 	}
 	updateImage();
-	//updateImage(mat_to_qimage(image_vec[cur_image_index]));
+	//updateImage(matToQImage(images[index]));
 }
 
 void QtGuiDicomViewer::createActions()

@@ -18,31 +18,22 @@ void DataSetReader::update()
 	advance(0);
 }
 
-DataSetReader::DataSetReader(std::filesystem::path path)
+void DataSetReader::loadData(std::filesystem::path const& path)
 {
 	images.clear();
-	try
-	{
-		if (is_regular_file(path))
-		{
-			images.push_back(getImage(readFile(path).get()));
-		}
-		else if (is_directory(path))
-		{
-			images = datasetToImages(readFolder(path));
-		}
 
-		if (images.empty())
-		{
-			throw std::runtime_error("Не удалось прочитать файл.");
-		}
-		update();
-	}
-	catch (std::exception& e)
+	if (is_regular_file(path))
 	{
-		error = e.what();
+		images.push_back(getImage(readFile(path).get()));
 	}
+	else if (is_directory(path))
+	{
+		images = datasetToImages(readFolder(path));
+	}
+
+	update();
 }
+
 
 void DataSetReader::next(int const count = 1)
 {
@@ -67,9 +58,4 @@ QImage DataSetReader::cur() const
 bool DataSetReader::empty() const
 {
 	return images.empty();
-}
-
-std::string DataSetReader::errorString() const
-{
-	return error;
 }

@@ -6,7 +6,7 @@
 namespace fs = std::filesystem;
 
 
-static cv::Mat bytes_to_mat(std::vector<char> bytes, const int width, const int height)
+static cv::Mat bytesToMat(std::vector<char> bytes, const int width, const int height)
 {
 	return cv::Mat(height, width, CV_8UC4, &bytes[0]).clone(); // make a copy
 }
@@ -111,7 +111,7 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 	std::vector<char> buffer(requestedBufferSize, 0);
 	draw.getBitmap(*image, imebra::drawBitmapType_t::drawBitmapRGBA, 4, reinterpret_cast<char*>(&(buffer.at(0))),
 	               requestedBufferSize);
-	auto mat = bytes_to_mat(buffer, width, height);
+	auto mat = bytesToMat(buffer, width, height);
 	if (mat.empty())
 	{
 		std::cout << "Can't open an qimage\n";
@@ -141,7 +141,7 @@ static void sort_by_instance_number(std::vector<std::unique_ptr<imebra::DataSet>
 }
 
 
-static std::vector<std::unique_ptr<imebra::DataSet>> read_folder(const std::wstring& path)
+static std::vector<std::unique_ptr<imebra::DataSet>> readFolder(const std::wstring& path)
 {
 	std::vector<std::unique_ptr<imebra::DataSet>> dicom_dataset{};
 
@@ -162,13 +162,13 @@ static std::vector<std::unique_ptr<imebra::DataSet>> read_folder(const std::wstr
 
 static void display_folder(std::wstring const& path)
 {
-	auto const sets = read_folder(path);
+	auto const sets = readFolder(path);
 	for (auto const& set : sets)
 	{
 	}
 }
 
-//static std::vector<cv::Mat> read_folder(const std::wstirng& path)
+//static std::vector<cv::Mat> readFolder(const std::wstirng& path)
 //{
 //	std::vector<std::unique_ptr<imebra::DataSet>> dicom_dataset{};
 //	for (auto const& entry : fs::directory_iterator(path))
@@ -191,7 +191,7 @@ static void display_folder(std::wstring const& path)
 //	return result;
 //}
 
-static std::vector<cv::Mat> dataset_to_images(const std::vector<std::unique_ptr<imebra::DataSet>>& set)
+static std::vector<cv::Mat> datasetToImages(const std::vector<std::unique_ptr<imebra::DataSet>>& set)
 {
 	auto result = std::vector<cv::Mat>{};
 	result.reserve(set.size());
@@ -319,7 +319,7 @@ static void check_all()
 	for (auto const& path : paths)
 	{
 		std::wcout << path << '\n';
-		auto const sets = read_folder(path);
+		auto const sets = readFolder(path);
 		for (auto const& set : sets)
 		{
 			if (auto tag_val = read_tag(*set, imebra::tagId_t::VOILUTSequence_0028_3010); !tag_val.empty())

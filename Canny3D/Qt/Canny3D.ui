@@ -93,10 +93,10 @@
     <property name="title">
      <string>Файл</string>
     </property>
-    <addaction name="action"/>
-    <addaction name="action_2"/>
+    <addaction name="openAction"/>
+    <addaction name="openFolderAction"/>
     <addaction name="separator"/>
-    <addaction name="action_4"/>
+    <addaction name="exitAction"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -108,17 +108,17 @@
     <bool>false</bool>
    </attribute>
   </widget>
-  <action name="action">
+  <action name="openAction">
    <property name="text">
     <string>Открыть</string>
    </property>
   </action>
-  <action name="action_2">
+  <action name="openFolderAction">
    <property name="text">
     <string>Открыть папку</string>
    </property>
   </action>
-  <action name="action_4">
+  <action name="exitAction">
    <property name="text">
     <string>Выход</string>
    </property>
@@ -128,5 +128,22 @@
  <resources>
   <include location="Canny3D.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>exitAction</sender>
+   <signal>triggered()</signal>
+   <receiver>Canny3DClass</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>285</x>
+     <y>183</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

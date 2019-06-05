@@ -11,8 +11,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtGuiDicomViewer", "QtGuiDi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtImageViewer", "QtImageViewer\QtImageViewer.vcxproj", "{4937E1A7-3BBD-43EE-8420-DD01E0E85460}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TreeViewer", "TreeViewer\TreeViewer.vcxproj", "{B354AB7B-42D2-4233-A0E1-09699A9C5217}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -35,10 +33,6 @@ Global
 		{4937E1A7-3BBD-43EE-8420-DD01E0E85460}.Debug|x64.Build.0 = Debug|x64
 		{4937E1A7-3BBD-43EE-8420-DD01E0E85460}.Release|x64.ActiveCfg = Release|x64
 		{4937E1A7-3BBD-43EE-8420-DD01E0E85460}.Release|x64.Build.0 = Release|x64
-		{B354AB7B-42D2-4233-A0E1-09699A9C5217}.Debug|x64.ActiveCfg = Debug|x64
-		{B354AB7B-42D2-4233-A0E1-09699A9C5217}.Debug|x64.Build.0 = Debug|x64
-		{B354AB7B-42D2-4233-A0E1-09699A9C5217}.Release|x64.ActiveCfg = Release|x64
-		{B354AB7B-42D2-4233-A0E1-09699A9C5217}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

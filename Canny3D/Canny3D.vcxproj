@@ -53,7 +53,7 @@
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PreprocessorDefinitions>UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -64,14 +64,14 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;d:\dev\CGAL\lib;d:\dev\CGAL-4.13\auxiliary\gmp\lib;d:\dev\libQGLViewer-2.7.1\QGLViewer;C:\tools\opencv\build\x64\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;d:\dev\CGAL\lib;d:\dev\CGAL-4.13\auxiliary\gmp\lib;d:\dev\libQGLViewer-2.7.1\QGLViewer;C:\tools\opencv\build\x64\vc15\lib;D:\Projects\DICOM\imebra\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>CGAL-vc140-mt-gd-4.13.lib;CGAL_Core-vc140-mt-gd-4.13.lib;CGAL_ImageIO-vc140-mt-gd-4.13.lib;CGAL_Qt5-vc140-mt-gd-4.13.lib;libgmp-10.lib;libmpfr-4.lib;QGLViewerd2.lib;opengl32.lib;glu32.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5OpenGLd.lib;Qt5Xmld.lib;opencv_world410d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CGAL-vc140-mt-gd-4.13.lib;CGAL_Core-vc140-mt-gd-4.13.lib;CGAL_ImageIO-vc140-mt-gd-4.13.lib;CGAL_Qt5-vc140-mt-gd-4.13.lib;libgmp-10.lib;libmpfr-4.lib;QGLViewerd2.lib;opengl32.lib;glu32.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5OpenGLd.lib;Qt5Xmld.lib;opencv_world410d.lib;imebra.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <QtMoc>
       <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
-      <IncludePath>.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include</IncludePath>
+      <IncludePath>.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include</IncludePath>
       <Define>UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</Define>
     </QtMoc>
     <QtUic>
@@ -87,7 +87,7 @@
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PreprocessorDefinitions>UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include</AdditionalIncludeDirectories>
       <DebugInformationFormat />
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -97,14 +97,14 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;d:\dev\CGAL\lib;d:\dev\CGAL-4.13\auxiliary\gmp\lib;d:\dev\libQGLViewer-2.7.1\QGLViewer;C:\tools\opencv\build\x64\vc15\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(QTDIR)\lib;d:\dev\CGAL\lib;d:\dev\CGAL-4.13\auxiliary\gmp\lib;d:\dev\libQGLViewer-2.7.1\QGLViewer;C:\tools\opencv\build\x64\vc15\lib;D:\Projects\DICOM\imebra\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>CGAL-vc140-mt-4.13.lib;CGAL_Core-vc140-mt-4.13.lib;CGAL_ImageIO-vc140-mt-4.13.lib;CGAL_Qt5-vc140-mt-4.13.lib;libgmp-10.lib;libmpfr-4.lib;QGLViewer2.lib;opengl32.lib;glu32.lib;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;Qt5OpenGL.lib;Qt5Xml.lib;opencv_world410.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CGAL-vc140-mt-4.13.lib;CGAL_Core-vc140-mt-4.13.lib;CGAL_ImageIO-vc140-mt-4.13.lib;CGAL_Qt5-vc140-mt-4.13.lib;libgmp-10.lib;libmpfr-4.lib;QGLViewer2.lib;opengl32.lib;glu32.lib;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;Qt5OpenGL.lib;Qt5Xml.lib;opencv_world410.lib;imebra.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <QtMoc>
       <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
-      <IncludePath>.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include</IncludePath>
+      <IncludePath>.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include</IncludePath>
       <Define>UNICODE;_UNICODE;WIN32;_ENABLE_EXTENDED_ALIGNED_STORAGE;WIN64;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_WIDGETS_LIB;%(PreprocessorDefinitions)</Define>
     </QtMoc>
     <QtUic>
@@ -118,7 +118,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Src\Canny3D.cpp" />
-    <ClCompile Include="Src\DataSetReaderCanny.cpp" />
+    <ClCompile Include="Src\DataSetReader.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\QGLMeshViewer.cpp" />
   </ItemGroup>
@@ -132,8 +132,11 @@
     <QtRcc Include="Qt\Canny3D.qrc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\DataSetReaderCanny.h" />
-    <ClInclude Include="Src\DisplayImageCanny.h" />
+    <QtMoc Include="Src\DataSetReader.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>
+    </QtMoc>
+    <ClInclude Include="Src\DisplayImage.h" />
     <ClInclude Include="Src\QGLMeshViewer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -8,19 +8,6 @@
 #include <optional>
 namespace fs = std::experimental::filesystem;
 
-static void remove_gray_threshold(cv::Mat img, int threshold = 220)
-{
-	return;
-	for (auto row = 0; row < img.rows; ++row)
-	{
-		for (auto col = 0; col < img.cols; ++col)
-		{
-			auto& x = img.at<uint8_t>(row, col);
-			if (x < threshold) x = 0;
-		}
-	}
-}
-
 static void removeUnwantedEdges(cv::Mat canny, cv::Mat original, int threshold = 170)
 {
 	auto const radius = 2;
@@ -30,15 +17,15 @@ static void removeUnwantedEdges(cv::Mat canny, cv::Mat original, int threshold =
 		{
 			auto& edgePixel = canny.at<uint8_t>(row, col);
 			if (edgePixel == 0) continue;
-			auto const to_remove = [&]
+			auto const toRemove = [&]
 			{
 				auto count = 0;
-				for (auto mask_row = -radius; mask_row <= radius; ++mask_row)
+				for (auto maskRow = -radius; maskRow <= radius; ++maskRow)
 				{
-					for (auto mask_col = -radius; mask_col <= radius; ++mask_col)
+					for (auto maskCol = -radius; maskCol <= radius; ++maskCol)
 					{
-						auto const r = row + mask_row;
-						auto const c = col + mask_col;
+						auto const r = row + maskRow;
+						auto const c = col + maskCol;
 						if (original.at<uint8_t>(r, c) >= threshold)
 							count++;
 					}
@@ -47,7 +34,7 @@ static void removeUnwantedEdges(cv::Mat canny, cv::Mat original, int threshold =
 				auto const area = (2 * radius + 1) * (2 * radius + 1);
 				return count < 2 * radius;
 			}();
-			if (to_remove)
+			if (toRemove)
 			{
 				edgePixel = 0;
 			}
@@ -66,10 +53,10 @@ static cv::Mat canny(cv::Mat img)
 
 static cv::Mat bytesToMat(std::vector<char>& bytes, const int width, const int height)
 {
-	auto mat = cv::Mat(height, width, CV_8UC4, &bytes[0]).clone();
+	const auto mat = cv::Mat(height, width, CV_8UC4, &bytes[0]).clone();
 	cv::Mat gray;
 	cvtColor(mat, gray, cv::COLOR_RGBA2GRAY);
-	return gray; // make a copy
+	return gray;
 }
 
 static int32_t readTag(const imebra::DataSet* dataset, const imebra::tagId_t& tag)
@@ -121,12 +108,12 @@ static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> 
 
 	imebra::DrawBitmap draw{chain};
 
-	const auto bufferSize = draw.getBitmap(*data.image, 
+	const auto buffer_size = draw.getBitmap(*data.image, 
 		imebra::drawBitmapType_t::drawBitmapRGBA, 4, nullptr, 0);
 
-	std::vector<char> buffer(bufferSize, 0);
+	std::vector<char> buffer(buffer_size, 0);
 	draw.getBitmap(*data.image, imebra::drawBitmapType_t::drawBitmapRGBA, 4,
-	               reinterpret_cast<char*>(&buffer.at(0)), bufferSize);
+	               reinterpret_cast<char*>(&buffer.at(0)), buffer_size);
 
 	return bytesToMat(buffer, width, height);;
 }

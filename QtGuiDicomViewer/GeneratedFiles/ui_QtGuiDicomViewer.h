@@ -12,11 +12,14 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -25,6 +28,10 @@ class Ui_QtGuiDicomViewerClass
 {
 public:
     QWidget *centralWidget;
+    QWidget *widget;
+    QVBoxLayout *verticalLayout;
+    QLabel *imageLabel;
+    QScrollBar *horizontalScrollBar;
     QMenuBar *menuBar;
     QMenu *menu;
     QToolBar *mainToolBar;
@@ -38,6 +45,25 @@ public:
         QtGuiDicomViewerClass->resize(774, 567);
         centralWidget = new QWidget(QtGuiDicomViewerClass);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
+        widget = new QWidget(centralWidget);
+        widget->setObjectName(QString::fromUtf8("widget"));
+        widget->setGeometry(QRect(240, 100, 441, 291));
+        verticalLayout = new QVBoxLayout(widget);
+        verticalLayout->setSpacing(6);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        imageLabel = new QLabel(widget);
+        imageLabel->setObjectName(QString::fromUtf8("imageLabel"));
+
+        verticalLayout->addWidget(imageLabel);
+
+        horizontalScrollBar = new QScrollBar(widget);
+        horizontalScrollBar->setObjectName(QString::fromUtf8("horizontalScrollBar"));
+        horizontalScrollBar->setOrientation(Qt::Horizontal);
+
+        verticalLayout->addWidget(horizontalScrollBar);
+
         QtGuiDicomViewerClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(QtGuiDicomViewerClass);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -65,6 +91,7 @@ public:
     void retranslateUi(QMainWindow *QtGuiDicomViewerClass)
     {
         QtGuiDicomViewerClass->setWindowTitle(QApplication::translate("QtGuiDicomViewerClass", "QtGuiDicomViewer", nullptr));
+        imageLabel->setText(QString());
         menu->setTitle(QApplication::translate("QtGuiDicomViewerClass", "\320\244\320\260\320\271\320\273", nullptr));
         toolBar->setWindowTitle(QApplication::translate("QtGuiDicomViewerClass", "toolBar", nullptr));
     } // retranslateUi

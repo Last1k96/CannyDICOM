@@ -19,10 +19,8 @@ private slots:
 	void openFolder();
 
 private:
-	static void initializeImageFileDialog(QFileDialog& dialog, QFileDialog::AcceptMode acceptMode);
 	Ui::Canny3DClass ui;
 
-	void createActions();
 	void updateImage();
 	DataSetReader reader;
 	QImage image;

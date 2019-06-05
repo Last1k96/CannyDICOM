@@ -34,6 +34,15 @@ void DataSetReader::loadData(std::filesystem::path const& path)
 	update();
 }
 
+void DataSetReader::setIndex(int index)
+{
+	if (index >= images.size())
+	{
+		throw std::runtime_error("Индекс вне границы массива");
+	}
+	this->index = index;
+}
+
 
 void DataSetReader::next(int const count = 1)
 {

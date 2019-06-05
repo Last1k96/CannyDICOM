@@ -132,6 +132,7 @@
     <QtRcc Include="Qt\Canny3D.qrc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Utility.h" />
     <QtMoc Include="Src\DataSetReader.h">
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>

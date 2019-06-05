@@ -22,6 +22,7 @@ public:
 	void loadData(std::filesystem::path const& path);
 	void next(int count);
 	void prev(int count);
+	void setIndex(int index);
 	[[nodiscard]] QImage cur() const;
 	[[nodiscard]] bool empty() const;
 };

@@ -1,10 +1,12 @@
 #include "Canny3D.h"
-#include <qfiledialog.h>
-#include <qimagereader.h>
-#include <qimagewriter.h>
+#include <QFileDialog>
+#include <QDialog>
+#include <QImageReader>
+#include <QImageWriter>
 #include "DataSetReader.h"
 #include <qmessagebox.h>
 #include <QAction>
+#include "Utility.h"
 
 Canny3D::Canny3D(QWidget* parent)
 	: QMainWindow(parent)
@@ -39,27 +41,6 @@ bool Canny3D::loadFiles(const QString& fileName)
 	return true;
 }
 
-void Canny3D::initializeImageFileDialog(QFileDialog& dialog, QFileDialog::AcceptMode acceptMode)
-{
-	static bool firstDialog = true;
-
-	if (firstDialog)
-	{
-		firstDialog = false;
-		dialog.setDirectory(QDir::currentPath());
-	}
-
-	QStringList mimeTypeFilters;
-	const QByteArrayList supportedMimeTypes = acceptMode == QFileDialog::AcceptOpen
-		? QImageReader::supportedMimeTypes()
-		: QImageWriter::supportedMimeTypes();
-	foreach(const QByteArray & mimeTypeName, supportedMimeTypes)
-		mimeTypeFilters.append(mimeTypeName);
-	mimeTypeFilters.sort();
-	if (acceptMode == QFileDialog::AcceptSave)
-		dialog.setDefaultSuffix("jpg");
-}
-
 
 void Canny3D::updateImage()
 {
@@ -70,8 +51,14 @@ void Canny3D::updateImage()
 
 void Canny3D::open()
 {
-	QFileDialog dialog(this, tr("Open File"));
-	initializeImageFileDialog(dialog, QFileDialog::AcceptOpen);
+	QFileDialog dialog(this, QString::fromWCharArray(L"Открыть файл"));
+
+	static bool firstDialog = true;
+	if (firstDialog)
+	{
+		firstDialog = false;
+		dialog.setDirectory(QDir::currentPath());
+	}
 
 	while (dialog.exec() == QDialog::Accepted && !loadFiles(dialog.selectedFiles().first()))
 	{
@@ -80,10 +67,18 @@ void Canny3D::open()
 
 void Canny3D::openFolder()
 {
-	// TODO change to c:/
-	QString dir = QFileDialog::getExistingDirectory(nullptr, QObject::tr("Open Directory"),
-		"d:/DICOM/Latishev-after1operation/DICOM",
-		QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-	if (dir.size() == 0) return;
-	loadFiles(dir);
+	QFileDialog dialog(this, QString::fromWCharArray(L"Открыть папку"));
+
+	static bool firstDialog = true;
+	if (firstDialog)
+	{
+		firstDialog = false;
+		dialog.setDirectory(tr("d:/DICOM/Latishev-after1operation/DICOM"));
+	}
+
+	dialog.setFileMode(QFileDialog::Directory);
+
+	while (dialog.exec() == QDialog::Accepted && !loadFiles(dialog.selectedFiles().first()))
+	{
+	}
 }

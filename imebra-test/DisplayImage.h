@@ -51,7 +51,7 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 	// Get the color space
 	std::string colorSpace = image->getColorSpace();
 
-	// Get the size in pixels
+	// Get the imageCount in pixels
 
 	auto const width = image->getWidth();
 	auto const height = image->getHeight();
@@ -104,7 +104,7 @@ static cv::Mat get_image(imebra::DataSet* loadedDataSet)
 	// We create a DrawBitmap that always apply the chain transform before getting the RGB qimage
 	imebra::DrawBitmap draw{chain};
 
-	// Ask for the size of the buffer (in bytes)
+	// Ask for the imageCount of the buffer (in bytes)
 	const size_t requestedBufferSize = draw.getBitmap(*image, imebra::drawBitmapType_t::drawBitmapRGBA, 4, nullptr, 0);
 
 	// Now we allocate the buffer and then ask DrawBitmap to fill it

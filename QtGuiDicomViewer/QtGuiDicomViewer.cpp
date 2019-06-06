@@ -1,12 +1,12 @@
-#include "QtGuiDicomViewer.h"
+#include "DicomViewer.h"
 
-#include "QtGuiDicomViewer.h"
+#include "DicomViewer.h"
 
 #include <QtWidgets>
 #include "DisplayImage.h"
 #include "DataSetReader.h"
 
-QtGuiDicomViewer::QtGuiDicomViewer(QWidget* parent)
+DicomViewer::DicomViewer(QWidget* parent)
 	: QMainWindow(parent)
 	  , imageLabel(new QLabel)
 {
@@ -23,7 +23,7 @@ QtGuiDicomViewer::QtGuiDicomViewer(QWidget* parent)
 	resize(QGuiApplication::primaryScreen()->availableSize() * 4 / 5);
 }
 
-bool QtGuiDicomViewer::loadFiles(const QString& fileName)
+bool DicomViewer::loadFiles(const QString& fileName)
 {
 	//QImageReader reader(fileName);
 	//reader.setAutoTransform(true);
@@ -49,14 +49,14 @@ bool QtGuiDicomViewer::loadFiles(const QString& fileName)
 	return true;
 }
 
-void QtGuiDicomViewer::updateImage()
+void DicomViewer::updateImage()
 {
 	image = reader.cur();
 	imageLabel->setPixmap(QPixmap::fromImage(image));
 	imageLabel->adjustSize();
 }
 
-bool QtGuiDicomViewer::saveFile(const QString& fileName)
+bool DicomViewer::saveFile(const QString& fileName)
 {
 	QImageWriter writer(fileName);
 
@@ -101,7 +101,7 @@ static void initializeImageFileDialog(QFileDialog& dialog, QFileDialog::AcceptMo
 		dialog.setDefaultSuffix("jpg");
 }
 
-void QtGuiDicomViewer::open()
+void DicomViewer::open()
 {
 	QFileDialog dialog(this, tr("Open File"));
 	initializeImageFileDialog(dialog, QFileDialog::AcceptOpen);
@@ -111,7 +111,7 @@ void QtGuiDicomViewer::open()
 	}
 }
 
-void QtGuiDicomViewer::openFolder()
+void DicomViewer::openFolder()
 {
 	// TODO change to c:/
 	QString dir = QFileDialog::getExistingDirectory(nullptr, QObject::tr("Open Directory"),
@@ -122,7 +122,7 @@ void QtGuiDicomViewer::openFolder()
 	loadFiles(dir);
 }
 
-void QtGuiDicomViewer::saveAs()
+void DicomViewer::saveAs()
 {
 	QFileDialog dialog(this, tr("Save File As"));
 	initializeImageFileDialog(dialog, QFileDialog::AcceptSave);
@@ -132,7 +132,7 @@ void QtGuiDicomViewer::saveAs()
 	}
 }
 
-void QtGuiDicomViewer::about()
+void DicomViewer::about()
 {
 	QMessageBox::about(this, tr("About Image Viewer"),
 	                   tr("<p>The <b>Image Viewer</b> example shows how to combine QLabel "
@@ -149,7 +149,7 @@ void QtGuiDicomViewer::about()
 		                   "shows how to use QPainter to print an qimage-></p>"));
 }
 
-bool QtGuiDicomViewer::eventFilter(QObject* obj, QEvent* event)
+bool DicomViewer::eventFilter(QObject* obj, QEvent* event)
 {
 	if (event->type() == QEvent::Wheel)
 	{
@@ -162,7 +162,7 @@ bool QtGuiDicomViewer::eventFilter(QObject* obj, QEvent* event)
 	return false;
 }
 
-void QtGuiDicomViewer::handleWheelEvent(QWheelEvent* e)
+void DicomViewer::handleWheelEvent(QWheelEvent* e)
 {
 	const int k = ceil(abs(e->delta()) / 120);
 	if (e->delta() > 0)
@@ -177,16 +177,16 @@ void QtGuiDicomViewer::handleWheelEvent(QWheelEvent* e)
 	//updateImage(matToQImage(images[index]));
 }
 
-void QtGuiDicomViewer::createActions()
+void DicomViewer::createActions()
 {
 	QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
 
-	QAction* openAct = fileMenu->addAction(tr("&Open..."), this, &QtGuiDicomViewer::open);
+	QAction* openAct = fileMenu->addAction(tr("&Open..."), this, &DicomViewer::open);
 	openAct->setShortcut(QKeySequence::Open);
 
-	QAction* openFolderAct = fileMenu->addAction(tr("Open &folder..."), this, &QtGuiDicomViewer::openFolder);
+	QAction* openFolderAct = fileMenu->addAction(tr("Open &folder..."), this, &DicomViewer::openFolder);
 
-	//printAct = fileMenu->addAction(tr("&Print..."), this, &QtGuiDicomViewer::print);
+	//printAct = fileMenu->addAction(tr("&Print..."), this, &DicomViewer::print);
 	//printAct->setShortcut(QKeySequence::Print);
 	//printAct->setEnabled(false);
 
@@ -197,13 +197,13 @@ void QtGuiDicomViewer::createActions()
 
 	QMenu* viewMenu = menuBar()->addMenu(tr("&View"));
 
-	//normalSizeAct = viewMenu->addAction(tr("&Normal Size"), this, &QtGuiDicomViewer::normalSize);
+	//normalSizeAct = viewMenu->addAction(tr("&Normal Size"), this, &DicomViewer::normalSize);
 	//normalSizeAct->setShortcut(tr("Ctrl+S"));
 	//normalSizeAct->setEnabled(false);
 
 	viewMenu->addSeparator();
 
 	QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
-	helpMenu->addAction(tr("&About"), this, &QtGuiDicomViewer::about);
+	helpMenu->addAction(tr("&About"), this, &DicomViewer::about);
 	helpMenu->addAction(tr("About &Qt"), &QApplication::aboutQt);
 }

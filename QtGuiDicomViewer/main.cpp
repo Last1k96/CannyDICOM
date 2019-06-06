@@ -1,10 +1,10 @@
-#include "QtGuiDicomViewer.h"
+#include "DicomViewer.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char* argv[])
 {
 	QApplication a(argc, argv);
-	QtGuiDicomViewer w;
+	DicomViewer w;
 	w.show();
 	return a.exec();
 }

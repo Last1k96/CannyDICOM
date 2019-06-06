@@ -131,12 +131,6 @@
     <QtMoc Include="QtGuiDicomViewer.h" />
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="QtGuiDicomViewer.ui" />
-  </ItemGroup>
-  <ItemGroup>
-    <QtRcc Include="QtGuiDicomViewer.qrc" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="DataSetReader.h" />
     <ClInclude Include="DisplayImage.h" />
   </ItemGroup>

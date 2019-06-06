@@ -39,7 +39,7 @@
     <ClCompile Include="Src\QGLMeshViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Src\DataSetReader.cpp">
+    <ClCompile Include="Src\DicomViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -52,7 +52,7 @@
     <QtMoc Include="Src\Canny3D.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <QtMoc Include="Src\DataSetReader.h">
+    <QtMoc Include="Src\DicomViewer.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
@@ -63,9 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\QGLMeshViewer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\DisplayImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Src\Utility.h">

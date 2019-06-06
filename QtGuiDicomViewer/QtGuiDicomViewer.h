@@ -1,22 +1,17 @@
 #pragma once
 
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QScrollArea>
-#include <QtWidgets/QHBoxLayout>
 #include <QWheelEvent>
-#include <opencv2/core/mat.hpp>
-#include "ui_QtGuiDicomViewer.h"
+#include "ui_DicomViewer.h"
 #include "DataSetReader.h"
 
 class QGraphicsSceneWheelEvent;
 
-class QtGuiDicomViewer : public QMainWindow
+class DicomViewer : public QMainWindow
 {
 Q_OBJECT
 
 public:
-	QtGuiDicomViewer(QWidget* parent = Q_NULLPTR);
+	DicomViewer(QWidget* parent = Q_NULLPTR);
 	bool loadFiles(const QString&);
 
 private slots:

@@ -14,6 +14,7 @@ public:
 	bool loadFiles(const QString&);
 		
 	void addNewTab() const;
+	void addNewTab3D() const;
 
 	bool initiateOpenDialog(QString const& dialogName, QFileDialog::FileMode dialogType);
 

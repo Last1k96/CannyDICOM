@@ -166,9 +166,15 @@ void Canny3D::open()
 	addNewTab();
 }
 
+void Canny3D::updateTree()
+{
+	
+}
+
 void Canny3D::openFolder()
 {
 	auto const success = initiateOpenDialog(QString::fromWCharArray(L"Открыть папку"), QFileDialog::Directory);
 	if (!success) return;
-	addNewTab();
+	updateTree();
+	//addNewTab();
 }

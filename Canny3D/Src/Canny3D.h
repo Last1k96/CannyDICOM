@@ -20,6 +20,7 @@ public:
 
 private slots:
 	void open();
+	void updateTree();
 	void openFolder();
 
 private:

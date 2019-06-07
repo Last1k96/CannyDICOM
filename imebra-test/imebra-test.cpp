@@ -13,9 +13,8 @@ int main(int argc, const char* argv[])
 {
 	const std::wstring path = L"d:\\korotkov\\DICOM\\17020708\\29510000\\80509054.dcm";
 	//L"d:\\DICOM\\Kalinin-before\\DICOM\\00000";
-	//auto const dataset_vector = readFolder(L"d:\\DICOM\\Kalinin-before\\DICOM");
+	auto const dataset_vector = readFolder(L"d:/DICOM/Krupin-before/DICOM/D201508/DD1014");
 
-	return 0;
 	auto const loadedDataSet = std::unique_ptr<imebra::DataSet>(imebra::CodecFactory::load(path));
 
 	auto tags = loadedDataSet->getTags();

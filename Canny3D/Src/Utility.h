@@ -102,10 +102,20 @@ struct VOI
 	double width;
 };
 
+struct treeTags
+{
+	std::wstring patientName;
+	std::wstring modality;
+	std::wstring studyDescription;
+	std::wstring seriesDescription;
+
+};
+
 struct ImebraImage
 {
 	std::shared_ptr<imebra::Image const> image{};
 	std::optional<VOI> voi;
+	treeTags tags;
 };
 
 static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> voi = {})
@@ -142,20 +152,46 @@ static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> 
 	return bytesToMat(buffer, width, height);;
 }
 
+static std::wstring read_tag(const imebra::DataSet& dataset, const imebra::TagId& tagId)
+{
+	try { return dataset.getUnicodeString(tagId, 0); }
+	catch (...)
+	{
+	}
+	return {};
+}
+
+static std::wstring read_tag(const imebra::DataSet& dataset, const imebra::tagId_t& tag)
+{
+	try { return read_tag(dataset, imebra::TagId(tag)); }
+	catch (...)
+	{
+	}
+	return {};
+}
+
 static ImebraImage getImage(imebra::DataSet* loadedDataSet)
 {
 	ImebraImage result;
+	
 	result.image = std::shared_ptr<imebra::Image>(loadedDataSet->getImage(0));
 	if (!imebra::ColorTransformsFactory::isMonochrome(result.image->getColorSpace()))
 	{
 		throw std::runtime_error("Image must be monochrome.");
 	}
-
-	auto vois = loadedDataSet->getVOIs();
-	if (!vois.empty())
+	
+	if (auto const vois = loadedDataSet->getVOIs(); !vois.empty())
 	{
 		result.voi = VOI{vois[0].center, vois[0].width};
 	}
+	
+	auto tags = treeTags
+	{
+		read_tag(*loadedDataSet, imebra::tagId_t::PatientName_0010_0010),
+		read_tag(*loadedDataSet, imebra::tagId_t::Modality_0008_0060),
+		read_tag(*loadedDataSet, imebra::tagId_t::StudyDescription_0008_1030),
+		read_tag(*loadedDataSet, imebra::tagId_t::SeriesDescription_0008_103E),
+	};
 
 	return result;
 }
@@ -212,6 +248,8 @@ static std::vector<std::unique_ptr<imebra::DataSet>> readFolder(const std::wstri
 
 	return dicom_dataset;
 }
+
+
 
 static std::vector<ImebraImage> datasetToImages(const std::vector<std::unique_ptr<imebra::DataSet>>& set)
 {

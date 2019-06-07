@@ -42,6 +42,7 @@ static void removeUnwantedEdges(cv::Mat canny, cv::Mat original, int threshold =
 		}
 	}
 }
+
 static cv::Mat gauss(cv::Mat img, int gaussMaskDiameter = 5, double gaussSigma = 1)
 {
 	cv::Mat blured;
@@ -53,7 +54,7 @@ static cv::Mat gauss(cv::Mat img, int gaussMaskDiameter = 5, double gaussSigma =
 static cv::Mat toZeroThreshold(cv::Mat img)
 {
 	cv::Mat result;
-	cv::threshold(img, result, 180, 255, cv::THRESH_TOZERO);
+	threshold(img, result, 180, 255, cv::THRESH_TOZERO);
 	return result;
 }
 
@@ -64,14 +65,14 @@ static std::pair<int, int> otsuThreshold(cv::Mat img)
 		img, out, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU
 	);
 
-	return { 0.5 * threshold, threshold };
+	return {0.5 * threshold, threshold};
 }
 
 static cv::Mat canny(cv::Mat img, std::optional<std::pair<int, int>> threshold = {})
 {
 	cv::Mat edges;
 	auto const thld = 100;
-	cv::Canny(img, edges, thld, 180, 3, true);
+	Canny(img, edges, thld, 180, 3, true);
 	return edges;
 }
 
@@ -83,13 +84,18 @@ static cv::Mat bytesToMat(std::vector<char>& bytes, const int width, const int h
 	return gray;
 }
 
-static int32_t readTag(const imebra::DataSet* dataset, const imebra::tagId_t& tag)
+static std::wstring readTag(imebra::DataSet *const dataset, const imebra::TagId& tagId)
 {
-	try
+	try { return dataset->getUnicodeString(tagId, 0); }
+	catch (...)
 	{
-		auto const tagId = imebra::TagId(tag);
-		return dataset->getSignedLong(tagId, 0);
 	}
+	return {};
+}
+
+static std::wstring readTag(imebra::DataSet *const dataset, const imebra::tagId_t& tag)
+{
+	try { return readTag(dataset, imebra::TagId(tag)); }
 	catch (...)
 	{
 	}
@@ -108,14 +114,54 @@ struct treeTags
 	std::wstring modality;
 	std::wstring studyDescription;
 	std::wstring seriesDescription;
+	std::wstring studyInstanceUID;
+	std::wstring seriesInstanceUID;
 
+	treeTags(imebra::DataSet *const dataset)
+		: patientName{readTag(dataset, imebra::tagId_t::PatientName_0010_0010)}
+		  , modality{readTag(dataset, imebra::tagId_t::Modality_0008_0060)}
+		  , studyDescription{readTag(dataset, imebra::tagId_t::StudyDescription_0008_1030)}
+		  , seriesDescription{readTag(dataset, imebra::tagId_t::SeriesDescription_0008_103E)}
+		  , studyInstanceUID{readTag(dataset, imebra::tagId_t::StudyInstanceUID_0020_000D)}
+		  , seriesInstanceUID{readTag(dataset, imebra::tagId_t::SeriesInstanceUID_0020_000E)}
+	{
+	}
+
+	treeTags() = default;
+	treeTags(treeTags const&) = default;
+	treeTags& operator=(treeTags const&) = default;
+	treeTags(treeTags&&) = default;
+	treeTags& operator=(treeTags&&) = default;
+	~treeTags() = default;
+
+	bool operator<(treeTags const& other) const noexcept
+	{
+		return patientName < other.patientName
+			&& studyInstanceUID < other.studyInstanceUID
+			&& seriesInstanceUID < other.seriesInstanceUID;
+	}
 };
 
 struct ImebraImage
 {
 	std::shared_ptr<imebra::Image const> image{};
-	std::optional<VOI> voi;
-	treeTags tags;
+	std::optional<VOI> voi{};
+	treeTags tags{};
+
+	explicit ImebraImage(imebra::DataSet* const loadedDataSet)
+		: image{ std::shared_ptr<imebra::Image>(loadedDataSet->getImage(0)) }
+		, tags{loadedDataSet}
+	{
+		if (!imebra::ColorTransformsFactory::isMonochrome(image->getColorSpace()))
+		{
+			throw std::runtime_error("Image must be monochrome.");
+		}
+
+		if (auto const vois = loadedDataSet->getVOIs(); !vois.empty())
+		{
+			voi = VOI{vois[0].center, vois[0].width};
+		}
+	}
 };
 
 static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> voi = {})
@@ -125,7 +171,7 @@ static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> 
 
 	imebra::TransformsChain chain;
 	imebra::VOILUT voilutTransform;
-	
+
 	if (voi)
 	{
 		voilutTransform.setCenterWidth(voi->center, voi->width);
@@ -134,7 +180,7 @@ static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> 
 	{
 		voilutTransform.setCenterWidth(data.voi->center, data.voi->width);
 	}
-	else 
+	else
 	{
 		voilutTransform.applyOptimalVOI(*data.image, 0, 0, width, height);
 	}
@@ -142,59 +188,16 @@ static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> 
 
 	imebra::DrawBitmap draw{chain};
 
-	const auto buffer_size = draw.getBitmap(*data.image, 
-		imebra::drawBitmapType_t::drawBitmapRGBA, 4, nullptr, 0);
+	const auto buffer_size = draw.getBitmap(*data.image,
+	                                        imebra::drawBitmapType_t::drawBitmapRGBA, 4, nullptr, 0);
 
 	std::vector<char> buffer(buffer_size, 0);
 	draw.getBitmap(*data.image, imebra::drawBitmapType_t::drawBitmapRGBA, 4,
 	               reinterpret_cast<char*>(&buffer.at(0)), buffer_size);
 
-	return bytesToMat(buffer, width, height);;
+	return bytesToMat(buffer, width, height);
 }
 
-static std::wstring read_tag(const imebra::DataSet& dataset, const imebra::TagId& tagId)
-{
-	try { return dataset.getUnicodeString(tagId, 0); }
-	catch (...)
-	{
-	}
-	return {};
-}
-
-static std::wstring read_tag(const imebra::DataSet& dataset, const imebra::tagId_t& tag)
-{
-	try { return read_tag(dataset, imebra::TagId(tag)); }
-	catch (...)
-	{
-	}
-	return {};
-}
-
-static ImebraImage getImage(imebra::DataSet* loadedDataSet)
-{
-	ImebraImage result;
-	
-	result.image = std::shared_ptr<imebra::Image>(loadedDataSet->getImage(0));
-	if (!imebra::ColorTransformsFactory::isMonochrome(result.image->getColorSpace()))
-	{
-		throw std::runtime_error("Image must be monochrome.");
-	}
-	
-	if (auto const vois = loadedDataSet->getVOIs(); !vois.empty())
-	{
-		result.voi = VOI{vois[0].center, vois[0].width};
-	}
-	
-	auto tags = treeTags
-	{
-		read_tag(*loadedDataSet, imebra::tagId_t::PatientName_0010_0010),
-		read_tag(*loadedDataSet, imebra::tagId_t::Modality_0008_0060),
-		read_tag(*loadedDataSet, imebra::tagId_t::StudyDescription_0008_1030),
-		read_tag(*loadedDataSet, imebra::tagId_t::SeriesDescription_0008_103E),
-	};
-
-	return result;
-}
 
 static std::unique_ptr<imebra::DataSet> readFile(const std::wstring& path)
 {
@@ -208,7 +211,7 @@ static std::wstring sv(const QString& s)
 
 static void sortDatasetsByTagid(std::vector<std::unique_ptr<imebra::DataSet>>& v, const imebra::tagId_t& tagId)
 {
-	std::vector<std::pair<int32_t, imebra::DataSet*>> sorted{};
+	std::vector<std::pair<std::wstring, imebra::DataSet*>> sorted{};
 	std::transform(v.begin(), v.end(), std::back_inserter(sorted), [&](auto& data)
 	{
 		auto tag = readTag(data.get(), tagId);
@@ -250,7 +253,6 @@ static std::vector<std::unique_ptr<imebra::DataSet>> readFolder(const std::wstri
 }
 
 
-
 static std::vector<ImebraImage> datasetToImages(const std::vector<std::unique_ptr<imebra::DataSet>>& set)
 {
 	auto result = std::vector<ImebraImage>{};
@@ -259,7 +261,7 @@ static std::vector<ImebraImage> datasetToImages(const std::vector<std::unique_pt
 	std::transform(set.begin(), set.end(), std::back_inserter(result),
 	               [&](auto const& dataset)
 	               {
-		               return getImage(dataset.get());
+		               return ImebraImage(dataset.get());
 	               });
 
 	return result;
@@ -288,7 +290,7 @@ static std::vector<ImebraImage> loadData(std::filesystem::path const& path)
 
 	if (is_regular_file(path))
 	{
-		images.push_back(getImage(readFile(path).get()));
+		images.emplace_back(readFile(path).get());
 	}
 	else if (is_directory(path))
 	{

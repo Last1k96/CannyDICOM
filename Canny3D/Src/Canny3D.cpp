@@ -36,31 +36,6 @@ bool Canny3D::loadFiles(const QString& fileName)
 	return true;
 }
 
-//void Canny3D::addNewTab() const
-//{
-//	auto tab = new QWidget();
-//	tab->setObjectName(QString::fromUtf8("tab"));
-//	auto layout = new QVBoxLayout(tab);
-//	layout->setSpacing(6);
-//	layout->setContentsMargins(11, 11, 11, 11);
-//	layout->setObjectName(QString::fromUtf8("verticalLayout"));
-//	auto viewer = new DicomViewer(tab, images); // important change!! add images
-//	viewer->setObjectName(QString::fromUtf8("widget"));
-//
-//	layout->addWidget(viewer);
-//
-//	auto slider = new QSlider(tab);
-//	slider->setObjectName(QString::fromUtf8("horizontalSlider"));
-//	slider->setOrientation(Qt::Horizontal);
-//
-//	layout->addWidget(slider);
-//
-//	slider->setRange(0, images.size());
-//	connect(slider, &QSlider::valueChanged, viewer, &DicomViewer::selectImage);
-//	connect(viewer, &DicomViewer::imageChanged, slider, &QSlider::setValue);
-//	ui.tabWidget->addTab(tab, "Name");
-//}
-
 void Canny3D::addNewTab() const
 {
 	auto tab = new QWidget();
@@ -176,5 +151,5 @@ void Canny3D::openFolder()
 	auto const success = initiateOpenDialog(QString::fromWCharArray(L"Открыть папку"), QFileDialog::Directory);
 	if (!success) return;
 	updateTree();
-	//addNewTab();
+	addNewTab();
 }

@@ -25,7 +25,7 @@ std::wstring tag_to_wstring(const imebra::TagId& tag)
 	return L"(" + int_to_hex(tag.getGroupId()) + L", " + int_to_hex(tag.getTagId()) + L")";
 }
 
-static std::wstring read_tag(const imebra::DataSet& dataset, const imebra::TagId& tagId)
+static std::wstring readTag(const imebra::DataSet& dataset, const imebra::TagId& tagId)
 {
 	try { return imebra::DicomDictionary::getUnicodeTagName(tagId) + L" : " + dataset.getUnicodeString(tagId, 0); }
 	catch (...)
@@ -34,9 +34,9 @@ static std::wstring read_tag(const imebra::DataSet& dataset, const imebra::TagId
 	return {};
 }
 
-static std::wstring read_tag(const imebra::DataSet& dataset, const imebra::tagId_t& tag)
+static std::wstring readTag(const imebra::DataSet& dataset, const imebra::tagId_t& tag)
 {
-	try { return read_tag(dataset, imebra::TagId(tag)); }
+	try { return readTag(dataset, imebra::TagId(tag)); }
 	catch (...)
 	{
 	}
@@ -126,7 +126,7 @@ static void sort_by_instance_number(std::vector<std::unique_ptr<imebra::DataSet>
 	auto sorted = std::vector<std::pair<std::wstring, imebra::DataSet*>>{};
 	std::transform(v.begin(), v.end(), std::back_inserter(sorted), [&](auto& data)
 	{
-		auto tag = read_tag(*data, imebra::tagId_t::InstanceNumber_0020_0013);
+		auto tag = readTag(*data, imebra::tagId_t::InstanceNumber_0020_0013);
 		return std::make_pair(tag, data.release());
 	});
 	std::stable_sort(sorted.begin(), sorted.end(), [](auto const& l, auto const& r)
@@ -254,7 +254,7 @@ std::vector<std::wstring> get_tags(const imebra::DataSet& dataset)
 	tag_names.reserve(tags.size());
 	std::transform(tags.begin(), tags.end(), std::back_inserter(tag_names), [&](const imebra::TagId& tag)
 	{
-		return tag_to_wstring(tag) + L" " + read_tag(dataset, tag);
+		return tag_to_wstring(tag) + L" " + readTag(dataset, tag);
 	});
 	return tag_names;
 }
@@ -322,7 +322,7 @@ static void check_all()
 		auto const sets = readFolder(path);
 		for (auto const& set : sets)
 		{
-			if (auto tag_val = read_tag(*set, imebra::tagId_t::VOILUTSequence_0028_3010); !tag_val.empty())
+			if (auto tag_val = readTag(*set, imebra::tagId_t::VOILUTSequence_0028_3010); !tag_val.empty())
 			{
 				std::wcout << tag_val << '\n';
 			}

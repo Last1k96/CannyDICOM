@@ -8,17 +8,22 @@
 #include "Utility.h"
 #include "DicomViewer.h"
 #include "QGLMeshViewer.h"
+#include "DicomTreeItem.h"
 
 Canny3D::Canny3D(QWidget* parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
+	
 	connect(ui.openAction, &QAction::triggered, this, &Canny3D::open);
 	connect(ui.openFolderAction, &QAction::triggered, this, &Canny3D::openFolder);
+	connect(ui.treeWidget, &QTreeWidget::expanded, this, &Canny3D::adjustColumns);
+	connect(ui.treeWidget, &QTreeWidget::itemDoubleClicked, this, &Canny3D::addNewTab);
 }
 
-bool Canny3D::loadFiles(const QString& fileName)
+std::vector<ImebraImage> Canny3D::loadFiles(const QString& fileName)
 {
+	auto images = std::vector<ImebraImage>{};
 	try
 	{
 		images = loadData(fileName.toStdWString());
@@ -29,25 +34,29 @@ bool Canny3D::loadFiles(const QString& fileName)
 		                         tr("Cannot load %1: %2")
 		                         .arg(QDir::toNativeSeparators(fileName),
 		                              QString::fromStdString(e.what())));
-		return false;
+		return {};
 	}
 
-	std::stable_sort(begin(images), end(images));
+	//setWindowFilePath(fileName);
 
-	setWindowFilePath(fileName);
-
-	return true;
+	return images;
 }
 
-void Canny3D::addNewTab() const
+void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 {
+	auto images = dynamic_cast<DicomTreeItem*>(item)->images;
+	const auto count = images.size();
+	if (count == 0) return;
+	auto const tabName = QString::fromStdWString(images.front().tags.groupName[0]) 
+				+ " (" + QString::fromStdWString(images.front().tags.groupName[2]) + ")";
+
 	auto tab = new QWidget();
 	tab->setObjectName(QString::fromUtf8("tab"));
 	auto verticalLayout = new QVBoxLayout(tab);
 	verticalLayout->setSpacing(6);
 	verticalLayout->setContentsMargins(11, 11, 11, 11);
 	verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-	auto widget = new DicomViewer(tab, images);
+	auto widget = new DicomViewer(tab, std::move(images));
 	widget->setObjectName(QString::fromUtf8("widget"));
 	QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 	sizePolicy3.setHorizontalStretch(0);
@@ -96,32 +105,47 @@ void Canny3D::addNewTab() const
 	horizontalLayout_2->addLayout(verticalLayout_2);
 
 	verticalLayout->addLayout(horizontalLayout_2);
-
-	horizontalSlider->setRange(0, images.size());
+	
+	horizontalSlider->setRange(0, count);
+	connect(ui.tabWidget, &QTabWidget::tabCloseRequested, ui.tabWidget, &QTabWidget::removeTab);
 	connect(horizontalSlider, &QSlider::valueChanged, widget, &DicomViewer::selectImage);
 	connect(widget, &DicomViewer::imageChanged, horizontalSlider, &QSlider::setValue);
-	connect(pushButton_2, &QPushButton::pressed, this, &Canny3D::addNewTab3D);
-	ui.tabWidget->addTab(tab, "Name");
+	connect(pushButton_2, &QPushButton::pressed, [&]() {
+		this->addNewTab3D(widget->images);
+	});
+
+	ui.tabWidget->addTab(tab, tabName);
 }
 
-void Canny3D::addNewTab3D() const
+void Canny3D::addNewTab3D(std::vector<ImebraImage> const& images) const
 {
 	auto tab = new QWidget();
 	tab->setObjectName(QString::fromUtf8("tab3D"));
 
 	auto widget = new QGLMeshViewer(tab);
 	widget->setObjectName(QString::fromUtf8("widget"));
-	ui.tabWidget->addTab(tab, "Name3D");
+	auto const tabName = QString::fromStdWString(images.front().tags.groupName[0]) + " 3D";
+
+	connect(ui.tabWidget, &QTabWidget::tabCloseRequested, ui.tabWidget, &QTabWidget::removeTab);
+	ui.tabWidget->addTab(tab, tabName);
 
 	auto verticalLayout = new QVBoxLayout(tab);
 	verticalLayout->setSpacing(0);
 	verticalLayout->addWidget(widget);
 }
 
-
-bool Canny3D::initiateOpenDialog(QString const& dialogName, QFileDialog::FileMode dialogType)
+void Canny3D::adjustColumns(QModelIndex const& index)
 {
-	QFileDialog dialog(this, dialogName);
+	for (auto i = 0; i < ui.treeWidget->columnCount(); ++i)
+	{
+		ui.treeWidget->resizeColumnToContents(i);
+	}
+}
+
+
+std::optional<std::vector<ImebraImage>> Canny3D::initiateOpenDialog(QString const& name, QFileDialog::FileMode type)
+{
+	QFileDialog dialog(this, name);
 
 	static bool firstDialog = true;
 	if (firstDialog)
@@ -130,73 +154,97 @@ bool Canny3D::initiateOpenDialog(QString const& dialogName, QFileDialog::FileMod
 		//dialog.setDirectory(QDir::currentPath());
 		dialog.setDirectory(tr("d:/DICOM/Latishev-after1operation/DICOM"));
 	}
+	dialog.setFileMode(type);
 
-	dialog.setFileMode(dialogType);
-
-	return (dialog.exec() == QDialog::Accepted) && loadFiles(dialog.selectedFiles().first());
+	if (dialog.exec() != QDialog::Accepted) return {};
+	return loadFiles(dialog.selectedFiles().first());
 }
 
 void Canny3D::open()
 {
-	auto const success = initiateOpenDialog(QString::fromWCharArray(L"Открыть файл"), QFileDialog::AnyFile);
-	if (!success) return;
-	addNewTab();
-}
-
-void Canny3D::updateTree()
-{
-	auto tree = ui.treeWidget;
-	tree->clear();
-	tree->setColumnCount(1);
-
-	using It = std::vector<ImebraImage>::iterator;
-
-	std::sort(begin(images), end(images), [](ImebraImage& lhs, ImebraImage& rhs)
-	{
-		return lhs.tags.patientName < rhs.tags.patientName;
-	});
-
-	auto patients = std::vector<std::pair<It, It>>{};
-	auto left = begin(images);
-	auto right = left;
-	while (right != end(images))
-	{
-		left = right;
-		right = std::adjacent_find(begin(images), end(images), [](ImebraImage& lhs, ImebraImage& rhs)
-		{
-			return lhs.tags.patientName != rhs.tags.patientName;
-		});
-		patients.emplace_back(left, right);
-	}
-
-	for (auto patient : patients)
-	{
-		std::sort(patient.first, patient.second, [](ImebraImage& lhs, ImebraImage& rhs)
-		{
-			return lhs.tags.patientName < rhs.tags.patientName;
-		});
-
-		auto patients = std::vector<std::pair<It, It>>{};
-		auto left = begin(images);
-		auto right = left;
-		while (right != end(images))
-		{
-			left = right;
-			right = std::adjacent_find(begin(images), end(images), [](ImebraImage& lhs, ImebraImage& rhs)
-			{
-				return lhs.tags.patientName != rhs.tags.patientName;
-			});
-			patients.emplace_back(left, right);
-		}
-	}
-
-
+	auto images = initiateOpenDialog(QString::fromWCharArray(L"Открыть файл"), QFileDialog::AnyFile);
+	if (images)
+		updateTree(std::move(*images));
+	//addNewTab(std::move(images));
 }
 
 void Canny3D::openFolder()
 {
-	auto const success = initiateOpenDialog(QString::fromWCharArray(L"Открыть папку"), QFileDialog::Directory);
-	if (!success) return;
-	updateTree();
-	addNewTab();
+	auto images = initiateOpenDialog(QString::fromWCharArray(L"Открыть папку"), QFileDialog::Directory);
+	if (images)
+		updateTree(std::move(*images));
+	//addNewTab(std::move(images));
+}
+
+using It = std::vector<ImebraImage>::iterator;
+
+static void createTree(QTreeWidgetItem* parent, It begin, It end, int tagId = 0)
+{
+	if (tagId == 3)
+	{
+		std::sort(begin, end, [](ImebraImage& lhs, ImebraImage& rhs)
+		{
+			return lhs.tags.instanceNumber < rhs.tags.instanceNumber;
+		});
+		return;
+	}
+
+	std::sort(begin, end, [&](ImebraImage& lhs, ImebraImage& rhs)
+	{
+		return lhs.tags.groupBy[tagId] < rhs.tags.groupBy[tagId];
+	});
+
+	auto right = begin;
+	while (right != end)
+	{
+		auto left = right;
+		right = std::adjacent_find(left, end, [&](ImebraImage& lhs, ImebraImage& rhs)
+		{
+			return lhs.tags.groupBy[tagId] != rhs.tags.groupBy[tagId];
+		});
+		if (right != end) ++right;
+
+		auto child = tagId == 2 ? new DicomTreeItem(parent, left, right) : new DicomTreeItem(parent, left, left);
+		if (tagId == 0)
+		{
+			child->setIcon(0, QIcon("Resources/patient.ico"));
+			child->setToolTip(0, QString::fromWCharArray(L"Пациент"));
+		}
+		else if (tagId == 1)
+		{
+			child->setIcon(0, QIcon("Resources/study.ico"));
+			child->setToolTip(0, QString::fromWCharArray(L"Исследование"));
+		}
+		else if (tagId == 2)
+		{
+			child->setIcon(0, QIcon("Resources/series.ico"));
+			child->setToolTip(0, QString::fromWCharArray(L"Изображения"));
+		}
+		child->setText(0, QString::fromStdWString(left->tags.groupName[tagId]));
+		createTree(child, left, right, tagId + 1);
+	}
+}
+
+void Canny3D::updateTree(std::vector<ImebraImage>&& images)
+{
+	auto tree = ui.treeWidget;
+	tree->clear();
+	auto root = tree->invisibleRootItem();
+
+	createTree(root, begin(images), end(images));
+
+	for (auto i = 0; i < tree->topLevelItemCount(); ++i)
+	{
+		auto patient = tree->topLevelItem(i);
+		for (auto j = 0; j < patient->childCount(); ++j)
+		{
+			auto study = patient->child(j);
+			auto str = std::wstring(L"(") + std::to_wstring(study->childCount()) + L": серии)";
+			study->setText(0, study->text(0) + QString::fromStdWString(str));
+		}
+	}
+	for (auto i = 0; i < tree->columnCount(); ++i)
+	{
+		tree->resizeColumnToContents(i);
+	}
 }

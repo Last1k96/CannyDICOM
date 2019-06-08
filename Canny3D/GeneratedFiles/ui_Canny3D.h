@@ -49,7 +49,6 @@ public:
     QGroupBox *groupBox;
     QVBoxLayout *verticalLayout_2;
     QPushButton *pushButton_2;
-    QWidget *tab_2;
     QMenuBar *menuBar;
     QMenu *menu;
     QToolBar *mainToolBar;
@@ -85,7 +84,9 @@ public:
         __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
         treeWidget->setHeaderItem(__qtreewidgetitem);
         treeWidget->setObjectName(QString::fromUtf8("treeWidget"));
+        treeWidget->setColumnCount(1);
         splitter->addWidget(treeWidget);
+        treeWidget->header()->setVisible(false);
         tabWidget = new QTabWidget(splitter);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -93,6 +94,7 @@ public:
         sizePolicy1.setVerticalStretch(8);
         sizePolicy1.setHeightForWidth(tabWidget->sizePolicy().hasHeightForWidth());
         tabWidget->setSizePolicy(sizePolicy1);
+        tabWidget->setTabsClosable(true);
         tab = new QWidget();
         tab->setObjectName(QString::fromUtf8("tab"));
         verticalLayout = new QVBoxLayout(tab);
@@ -151,9 +153,6 @@ public:
         verticalLayout->addLayout(horizontalLayout_2);
 
         tabWidget->addTab(tab, QString());
-        tab_2 = new QWidget();
-        tab_2->setObjectName(QString::fromUtf8("tab_2"));
-        tabWidget->addTab(tab_2, QString());
         splitter->addWidget(tabWidget);
 
         horizontalLayout->addWidget(splitter);
@@ -193,7 +192,6 @@ public:
         groupBox->setTitle(QApplication::translate("Canny3DClass", "\320\235\320\260\321\201\321\202\321\200\320\276\320\271\320\272\320\270", nullptr));
         pushButton_2->setText(QApplication::translate("Canny3DClass", "\320\237\320\276\321\201\321\202\321\200\320\276\320\270\321\202\321\214", nullptr));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("Canny3DClass", "Tab 1", nullptr));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("Canny3DClass", "Tab 2", nullptr));
         menu->setTitle(QApplication::translate("Canny3DClass", "\320\244\320\260\320\271\320\273", nullptr));
     } // retranslateUi
 

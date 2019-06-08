@@ -3,9 +3,9 @@
 #include <utility>
 #include "Utility.h"
 
-DicomViewer::DicomViewer(QWidget* parent, std::vector<ImebraImage> const& data)
+DicomViewer::DicomViewer(QWidget* parent, std::vector<ImebraImage>&& data)
 	: QLabel(parent)
-	  , images(data)
+	  , images(std::forward<std::vector<ImebraImage>>(data))
 {
 	this->setBackgroundRole(QPalette::Base);
 	this->setMinimumSize(1, 1);

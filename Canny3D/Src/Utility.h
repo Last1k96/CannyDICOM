@@ -110,23 +110,25 @@ struct VOI
 
 struct treeTags
 {
-	int64_t patientId{};
-	int64_t studyId{};
-	int64_t seriesNumber{};
+	std::vector<int64_t> groupBy{};
 	int64_t instanceNumber{};
 
-	std::wstring patientName{};
-	std::wstring studyDescription{};
-	std::wstring seriesDescription{};
+	std::vector<std::wstring> groupName{};
 
 	treeTags(imebra::DataSet* const dataset)
-		: patientId{std::stoll(readTag(dataset, imebra::tagId_t::PatientID_0010_0020))}
-		  , studyId{std::stoll(readTag(dataset, imebra::tagId_t::StudyID_0020_0010))}
-		  , seriesNumber{std::stoll(readTag(dataset, imebra::tagId_t::SeriesNumber_0020_0011))}
+		: groupBy
+		  {
+			  std::stoll(readTag(dataset, imebra::tagId_t::PatientID_0010_0020)),
+			  std::stoll(readTag(dataset, imebra::tagId_t::StudyID_0020_0010)),
+			  std::stoll(readTag(dataset, imebra::tagId_t::SeriesNumber_0020_0011)),
+		  }
 		  , instanceNumber{std::stoll(readTag(dataset, imebra::tagId_t::InstanceNumber_0020_0013))}
-		  , patientName{readTag(dataset, imebra::tagId_t::PatientName_0010_0010)}
-		  , studyDescription{readTag(dataset, imebra::tagId_t::StudyDescription_0008_1030)}
-		  , seriesDescription{readTag(dataset, imebra::tagId_t::SeriesDescription_0008_103E)}
+		  , groupName
+		  {
+			  readTag(dataset, imebra::tagId_t::PatientName_0010_0010),
+			  readTag(dataset, imebra::tagId_t::StudyDescription_0008_1030),
+			  readTag(dataset, imebra::tagId_t::SeriesDescription_0008_103E),
+		  }
 	{
 	}
 
@@ -158,28 +160,6 @@ struct ImebraImage
 			voi = VOI{vois[0].center, vois[0].width};
 		}
 	}
-
-	bool operator<(ImebraImage const& other) const { return true; }
-	//static void sort(std::vector<ImebraImage>::iterator beg, std::vector<ImebraImage>::iterator end)
-	//{
-	//	std::sort(begin(v), end(v), [](ImebraImage& lhs, ImebraImage& rhs)
-	//	{
-	//		return lhs.tags.patientName < rhs.tags.patientName;
-	//	});
-
-	//	auto left = begin(v);
-	//	auto right = begin(v);
-	//	do
-	//	{
-	//		left = right;
-	//		right = std::adjacent_find(left, end(v),
-	//			[](auto& lhs, auto& rhs)
-	//		{
-	//			return lhs.tags.patientName != rhs.tags.patientName;
-	//		});
-
-	//	} while ();
-	//}
 };
 
 static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> voi = {})
@@ -217,9 +197,10 @@ static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> 
 }
 
 
-static std::unique_ptr<imebra::DataSet> readFile(const std::wstring& path)
+static ImebraImage readFile(const std::wstring& path)
 {
-	return std::unique_ptr<imebra::DataSet>(imebra::CodecFactory::load(path));
+	auto dataset = std::unique_ptr<imebra::DataSet>(imebra::CodecFactory::load(path));
+	return ImebraImage{dataset.get()};
 }
 
 static std::wstring sv(const QString& s)
@@ -246,42 +227,23 @@ static void sortDatasetsByTagid(std::vector<std::unique_ptr<imebra::DataSet>>& v
 	}
 }
 
-static std::vector<std::unique_ptr<imebra::DataSet>> readFolder(const std::wstring& path)
+static std::vector<ImebraImage> readFolder(const std::wstring& path)
 {
-	std::vector<std::unique_ptr<imebra::DataSet>> data{};
+	std::vector<ImebraImage> data{};
 
 	for (auto const& entry : fs::directory_iterator(path))
 	{
 		try
 		{
-			data.emplace_back(imebra::CodecFactory::load(entry.path()));
+			auto dataset = std::unique_ptr<imebra::DataSet>(imebra::CodecFactory::load(entry.path()));
+			data.emplace_back(dataset.get());
 		}
 		catch (...)
 		{
 		}
 	}
 
-	//sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::SeriesNumber_0020_0011);
-	//sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::ConvolutionKernel_0018_1210);
-	//sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::SliceLocation_0020_1041);
-	//sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::SeriesTime_0008_0031);
-	//sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::SeriesDate_0008_0021);
 	return data;
-}
-
-
-static std::vector<ImebraImage> datasetToImages(const std::vector<std::unique_ptr<imebra::DataSet>>& set)
-{
-	auto result = std::vector<ImebraImage>{};
-	result.reserve(set.size());
-
-	std::transform(set.begin(), set.end(), std::back_inserter(result),
-	               [&](auto const& dataset)
-	               {
-		               return ImebraImage(dataset.get());
-	               });
-	std::sort(begin(result), end(result));
-	return result;
 }
 
 static QImage matToQImage(cv::Mat img)
@@ -307,11 +269,11 @@ static std::vector<ImebraImage> loadData(std::filesystem::path const& path)
 
 	if (is_regular_file(path))
 	{
-		images.emplace_back(readFile(path).get());
+		images.push_back(readFile(path));
 	}
 	else if (is_directory(path))
 	{
-		images = datasetToImages(readFolder(path));
+		images = readFolder(path);
 	}
 
 	return images;

@@ -12,14 +12,14 @@ class DicomViewer : public QLabel
 Q_OBJECT
 
 public:
-	explicit DicomViewer(QWidget* parent = Q_NULLPTR, std::vector<ImebraImage> const& data = {});
+	explicit DicomViewer(QWidget* parent = Q_NULLPTR, std::vector<ImebraImage> && data = {});
 [[nodiscard]] size_t imageCount() const;
 [[nodiscard]] size_t index() const;
 
 	cv::Mat computeImage();
+	std::vector<ImebraImage> const images{};
 
-private:
-	std::vector<ImebraImage> images{};
+private:	
 	size_t idx{};
 	void updateMargins();
 	cv::Mat currentImage;

@@ -4,6 +4,7 @@
 #include <qfiledialog.h>
 #include <QLabel>
 #include "Utility.h"
+#include "DicomTreeItem.h"
 
 class Canny3D : public QMainWindow
 {
@@ -11,21 +12,20 @@ class Canny3D : public QMainWindow
 
 public:
 	Canny3D(QWidget* parent = Q_NULLPTR);
-	bool loadFiles(const QString&);
+	std::vector<ImebraImage> loadFiles(const QString&);
 		
-	void addNewTab() const;
-	void addNewTab3D() const;
+	void addNewTab(QTreeWidgetItem* item, int column) const;
+	void addNewTab3D(std::vector<ImebraImage> const& images) const;
+	void updateTree(std::vector<ImebraImage>&& images);
+	void adjustColumns(QModelIndex const& index);
 
-
-	bool initiateOpenDialog(QString const& dialogName, QFileDialog::FileMode dialogType);
+	std::optional<std::vector<ImebraImage>> initiateOpenDialog(QString const& name, QFileDialog::FileMode type);
 
 private slots:
-	void open();
-	void updateTree();
+	void open();	
 	void openFolder();
 
 private:
 	Ui::Canny3DClass ui;
-	std::vector<ImebraImage> images{};
 
 };

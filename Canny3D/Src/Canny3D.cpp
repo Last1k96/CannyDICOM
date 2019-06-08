@@ -19,6 +19,7 @@ Canny3D::Canny3D(QWidget* parent)
 	connect(ui.openFolderAction, &QAction::triggered, this, &Canny3D::openFolder);
 	connect(ui.treeWidget, &QTreeWidget::expanded, this, &Canny3D::adjustColumns);
 	connect(ui.treeWidget, &QTreeWidget::itemDoubleClicked, this, &Canny3D::addNewTab);
+	connect(ui.tabWidget, &QTabWidget::tabCloseRequested, ui.tabWidget, &QTabWidget::removeTab);
 }
 
 std::vector<ImebraImage> Canny3D::loadFiles(const QString& fileName)
@@ -106,11 +107,10 @@ void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 
 	verticalLayout->addLayout(horizontalLayout_2);
 	
-	horizontalSlider->setRange(0, count);
-	connect(ui.tabWidget, &QTabWidget::tabCloseRequested, ui.tabWidget, &QTabWidget::removeTab);
+	horizontalSlider->setRange(0, count - 1);
 	connect(horizontalSlider, &QSlider::valueChanged, widget, &DicomViewer::selectImage);
 	connect(widget, &DicomViewer::imageChanged, horizontalSlider, &QSlider::setValue);
-	connect(pushButton_2, &QPushButton::pressed, [&]() {
+	connect(pushButton_2, &QPushButton::pressed, [this, widget]() {
 		this->addNewTab3D(widget->images);
 	});
 
@@ -124,9 +124,9 @@ void Canny3D::addNewTab3D(std::vector<ImebraImage> const& images) const
 
 	auto widget = new QGLMeshViewer(tab);
 	widget->setObjectName(QString::fromUtf8("widget"));
-	auto const tabName = QString::fromStdWString(images.front().tags.groupName[0]) + " 3D";
+	auto const tabName = QString::fromStdWString(images.front().tags.groupName[0])
+				+ " (" + QString::fromStdWString(images.front().tags.groupName[2]) + ") 3D";
 
-	connect(ui.tabWidget, &QTabWidget::tabCloseRequested, ui.tabWidget, &QTabWidget::removeTab);
 	ui.tabWidget->addTab(tab, tabName);
 
 	auto verticalLayout = new QVBoxLayout(tab);

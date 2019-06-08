@@ -19,17 +19,20 @@ Canny3D::Canny3D(QWidget* parent)
 
 bool Canny3D::loadFiles(const QString& fileName)
 {
-	try {
+	try
+	{
 		images = loadData(fileName.toStdWString());
 	}
 	catch (std::exception& e)
 	{
 		QMessageBox::information(this, QGuiApplication::applicationDisplayName(),
-			tr("Cannot load %1: %2")
-			.arg(QDir::toNativeSeparators(fileName),
-				QString::fromStdString(e.what())));
+		                         tr("Cannot load %1: %2")
+		                         .arg(QDir::toNativeSeparators(fileName),
+		                              QString::fromStdString(e.what())));
 		return false;
 	}
+
+	std::stable_sort(begin(images), end(images));
 
 	setWindowFilePath(fileName);
 
@@ -116,7 +119,6 @@ void Canny3D::addNewTab3D() const
 }
 
 
-
 bool Canny3D::initiateOpenDialog(QString const& dialogName, QFileDialog::FileMode dialogType)
 {
 	QFileDialog dialog(this, dialogName);
@@ -143,7 +145,52 @@ void Canny3D::open()
 
 void Canny3D::updateTree()
 {
-	
+	auto tree = ui.treeWidget;
+	tree->clear();
+	tree->setColumnCount(1);
+
+	using It = std::vector<ImebraImage>::iterator;
+
+	std::sort(begin(images), end(images), [](ImebraImage& lhs, ImebraImage& rhs)
+	{
+		return lhs.tags.patientName < rhs.tags.patientName;
+	});
+
+	auto patients = std::vector<std::pair<It, It>>{};
+	auto left = begin(images);
+	auto right = left;
+	while (right != end(images))
+	{
+		left = right;
+		right = std::adjacent_find(begin(images), end(images), [](ImebraImage& lhs, ImebraImage& rhs)
+		{
+			return lhs.tags.patientName != rhs.tags.patientName;
+		});
+		patients.emplace_back(left, right);
+	}
+
+	for (auto patient : patients)
+	{
+		std::sort(patient.first, patient.second, [](ImebraImage& lhs, ImebraImage& rhs)
+		{
+			return lhs.tags.patientName < rhs.tags.patientName;
+		});
+
+		auto patients = std::vector<std::pair<It, It>>{};
+		auto left = begin(images);
+		auto right = left;
+		while (right != end(images))
+		{
+			left = right;
+			right = std::adjacent_find(begin(images), end(images), [](ImebraImage& lhs, ImebraImage& rhs)
+			{
+				return lhs.tags.patientName != rhs.tags.patientName;
+			});
+			patients.emplace_back(left, right);
+		}
+	}
+
+
 }
 
 void Canny3D::openFolder()

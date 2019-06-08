@@ -84,7 +84,7 @@ static cv::Mat bytesToMat(std::vector<char>& bytes, const int width, const int h
 	return gray;
 }
 
-static std::wstring readTag(imebra::DataSet *const dataset, const imebra::TagId& tagId)
+static std::wstring readTag(imebra::DataSet* const dataset, const imebra::TagId& tagId)
 {
 	try { return dataset->getUnicodeString(tagId, 0); }
 	catch (...)
@@ -93,7 +93,7 @@ static std::wstring readTag(imebra::DataSet *const dataset, const imebra::TagId&
 	return {};
 }
 
-static std::wstring readTag(imebra::DataSet *const dataset, const imebra::tagId_t& tag)
+static std::wstring readTag(imebra::DataSet* const dataset, const imebra::tagId_t& tag)
 {
 	try { return readTag(dataset, imebra::TagId(tag)); }
 	catch (...)
@@ -110,20 +110,23 @@ struct VOI
 
 struct treeTags
 {
-	std::wstring patientName;
-	std::wstring modality;
-	std::wstring studyDescription;
-	std::wstring seriesDescription;
-	std::wstring studyInstanceUID;
-	std::wstring seriesInstanceUID;
+	int64_t patientId{};
+	int64_t studyId{};
+	int64_t seriesNumber{};
+	int64_t instanceNumber{};
 
-	treeTags(imebra::DataSet *const dataset)
-		: patientName{readTag(dataset, imebra::tagId_t::PatientName_0010_0010)}
-		  , modality{readTag(dataset, imebra::tagId_t::Modality_0008_0060)}
+	std::wstring patientName{};
+	std::wstring studyDescription{};
+	std::wstring seriesDescription{};
+
+	treeTags(imebra::DataSet* const dataset)
+		: patientId{std::stoll(readTag(dataset, imebra::tagId_t::PatientID_0010_0020))}
+		  , studyId{std::stoll(readTag(dataset, imebra::tagId_t::StudyID_0020_0010))}
+		  , seriesNumber{std::stoll(readTag(dataset, imebra::tagId_t::SeriesNumber_0020_0011))}
+		  , instanceNumber{std::stoll(readTag(dataset, imebra::tagId_t::InstanceNumber_0020_0013))}
+		  , patientName{readTag(dataset, imebra::tagId_t::PatientName_0010_0010)}
 		  , studyDescription{readTag(dataset, imebra::tagId_t::StudyDescription_0008_1030)}
 		  , seriesDescription{readTag(dataset, imebra::tagId_t::SeriesDescription_0008_103E)}
-		  , studyInstanceUID{readTag(dataset, imebra::tagId_t::StudyInstanceUID_0020_000D)}
-		  , seriesInstanceUID{readTag(dataset, imebra::tagId_t::SeriesInstanceUID_0020_000E)}
 	{
 	}
 
@@ -133,13 +136,6 @@ struct treeTags
 	treeTags(treeTags&&) = default;
 	treeTags& operator=(treeTags&&) = default;
 	~treeTags() = default;
-
-	bool operator<(treeTags const& other) const noexcept
-	{
-		return patientName < other.patientName
-			&& studyInstanceUID < other.studyInstanceUID
-			&& seriesInstanceUID < other.seriesInstanceUID;
-	}
 };
 
 struct ImebraImage
@@ -149,8 +145,8 @@ struct ImebraImage
 	treeTags tags{};
 
 	explicit ImebraImage(imebra::DataSet* const loadedDataSet)
-		: image{ std::shared_ptr<imebra::Image>(loadedDataSet->getImage(0)) }
-		, tags{loadedDataSet}
+		: image{std::shared_ptr<imebra::Image>(loadedDataSet->getImage(0))}
+		  , tags{loadedDataSet}
 	{
 		if (!imebra::ColorTransformsFactory::isMonochrome(image->getColorSpace()))
 		{
@@ -162,6 +158,28 @@ struct ImebraImage
 			voi = VOI{vois[0].center, vois[0].width};
 		}
 	}
+
+	bool operator<(ImebraImage const& other) const { return true; }
+	//static void sort(std::vector<ImebraImage>::iterator beg, std::vector<ImebraImage>::iterator end)
+	//{
+	//	std::sort(begin(v), end(v), [](ImebraImage& lhs, ImebraImage& rhs)
+	//	{
+	//		return lhs.tags.patientName < rhs.tags.patientName;
+	//	});
+
+	//	auto left = begin(v);
+	//	auto right = begin(v);
+	//	do
+	//	{
+	//		left = right;
+	//		right = std::adjacent_find(left, end(v),
+	//			[](auto& lhs, auto& rhs)
+	//		{
+	//			return lhs.tags.patientName != rhs.tags.patientName;
+	//		});
+
+	//	} while ();
+	//}
 };
 
 static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> voi = {})
@@ -230,26 +248,25 @@ static void sortDatasetsByTagid(std::vector<std::unique_ptr<imebra::DataSet>>& v
 
 static std::vector<std::unique_ptr<imebra::DataSet>> readFolder(const std::wstring& path)
 {
-	std::vector<std::unique_ptr<imebra::DataSet>> dicom_dataset{};
+	std::vector<std::unique_ptr<imebra::DataSet>> data{};
 
 	for (auto const& entry : fs::directory_iterator(path))
 	{
 		try
 		{
-			dicom_dataset.emplace_back(imebra::CodecFactory::load(entry.path()));
+			data.emplace_back(imebra::CodecFactory::load(entry.path()));
 		}
 		catch (...)
 		{
 		}
 	}
-	sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::SeriesNumber_0020_0011);
+
+	//sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::SeriesNumber_0020_0011);
 	//sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::ConvolutionKernel_0018_1210);
 	//sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::SliceLocation_0020_1041);
 	//sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::SeriesTime_0008_0031);
 	//sortDatasetsByTagid(dicom_dataset, imebra::tagId_t::SeriesDate_0008_0021);
-
-
-	return dicom_dataset;
+	return data;
 }
 
 
@@ -263,7 +280,7 @@ static std::vector<ImebraImage> datasetToImages(const std::vector<std::unique_pt
 	               {
 		               return ImebraImage(dataset.get());
 	               });
-
+	std::sort(begin(result), end(result));
 	return result;
 }
 

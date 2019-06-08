@@ -155,7 +155,7 @@ static std::vector<std::unique_ptr<imebra::DataSet>> readFolder(const std::wstri
 		{
 		}
 	}
-	sort_by_instance_number(dicom_dataset);
+	//sort_by_instance_number(dicom_dataset);
 
 	return dicom_dataset;
 }
@@ -233,7 +233,7 @@ static std::set<std::wstring> get_tags_union(std::vector<std::unique_ptr<imebra:
 			//{
 			//	return dataset->getUnicodeString(tag, 0, L"");
 			//}();
-			current_set.insert(tag_string +L"\t" + tag_name);
+			current_set.insert(tag_string + L"\t" + tag_name);
 		}
 		auto current_difference = std::set<std::wstring>{};
 
@@ -247,7 +247,7 @@ static std::set<std::wstring> get_tags_union(std::vector<std::unique_ptr<imebra:
 	return union_difference;
 }
 
-std::vector<std::wstring> get_tags(const imebra::DataSet& dataset)
+static std::vector<std::wstring> get_tags(const imebra::DataSet& dataset)
 {
 	auto const tags = dataset.getTags();
 	auto tag_names = std::vector<std::wstring>{};
@@ -259,11 +259,38 @@ std::vector<std::wstring> get_tags(const imebra::DataSet& dataset)
 	return tag_names;
 }
 
+static std::wstring get_tag_description(const imebra::TagId& tag) {
+	try
+	{
+		return imebra::DicomDictionary::getUnicodeTagName(tag);
+	}
+	catch (...)
+	{
+	}
+	return {};
+}
+
+std::vector<std::wstring> get_tags_names(const imebra::DataSet& dataset)
+{
+	auto const tags = dataset.getTags();
+	auto tag_names = std::vector<std::wstring>{};
+	tag_names.reserve(tags.size());
+	std::transform(tags.begin(), tags.end(), std::back_inserter(tag_names), [&](const imebra::TagId& tag)
+	{
+		return tag_to_wstring(tag) + L" " + get_tag_description(tag);
+	});
+	return tag_names;
+}
+
 std::set<std::wstring> different_tag_values(const imebra::DataSet& set1, const imebra::DataSet& set2)
 {
 	auto different_values = std::set<std::wstring>{};
-	auto const tags1 = get_tags(set1);
-	auto const tags2 = get_tags(set2);
+	auto tags1 = get_tags(set1);
+	auto tags2 = get_tags(set2);
+
+	std::sort(begin(tags1), end(tags1));
+	std::sort(begin(tags2), end(tags2));
+
 	std::set_symmetric_difference(tags1.begin(), tags1.end(), tags2.begin(), tags2.end(),
 	                              std::inserter(different_values, different_values.end()));
 	return different_values;
@@ -301,9 +328,8 @@ static void print_series_tag_difference()
 //}
 
 
-static void check_all()
+static void union_tags_in_all_datasets()
 {
-
 	std::vector<std::wstring> paths = {
 		L"d:/DICOM/Panasenko/DICOM",
 		L"d:/DICOM/Prohorov-after/DICOM/D201504/DD2409",
@@ -316,17 +342,50 @@ static void check_all()
 		L"d:/DICOM/Lukin-after1operation/DICOM/D201111/DD1111",
 		L"d:/DICOM/Lukin-after2operation/DICOM/D201211/DD1512"
 	};
+	auto result = std::vector<std::wstring>{};
 	for (auto const& path : paths)
 	{
 		std::wcout << path << '\n';
-		auto const sets = readFolder(path);
-		for (auto const& set : sets)
+		auto sets = readFolder(path);
+		auto unique = std::vector<std::wstring>{get_tags_names(*sets.front())};
+		for (auto i = 1; i < sets.size(); ++i)
 		{
-			if (auto tag_val = readTag(*set, imebra::tagId_t::VOILUTSequence_0028_3010); !tag_val.empty())
-			{
-				std::wcout << tag_val << '\n';
-			}
+			auto intersection = std::vector<std::wstring>{};
+			auto tags = get_tags_names(*sets[i]);
+			std::set_intersection(begin(tags), end(tags), begin(unique), end(unique), 
+				std::back_inserter(intersection));
+			std::swap(intersection, unique);
 		}
-
+		if (result.empty()) result = unique;
+		else
+		{
+			auto intersection = std::vector<std::wstring>{};
+			std::set_intersection(begin(result), end(result), begin(unique), end(unique),
+				std::back_inserter(intersection));
+			std::swap(intersection, result);
+		}
+		std::copy(begin(unique), end(unique), std::ostream_iterator<std::wstring, wchar_t>(std::wcout, L"\n"));
+		std::cout << "\n\n";
 	}
+	std::cout << "Tags in all datasets:\n";
+	std::copy(begin(result), end(result), std::ostream_iterator<std::wstring, wchar_t>(std::wcout, L"\n"));
+	std::cout << "\n\n";
+}
+
+static std::vector<std::wstring> different_values_of_tag(std::vector<std::unique_ptr<imebra::DataSet>> const& dataset,
+                                                         imebra::tagId_t tag)
+{
+	auto result = std::vector<std::wstring>{};
+	auto tags = std::vector<std::wstring>{};
+	auto tagVal = std::unique_ptr<imebra::Tag>(dataset[0]->getTag(imebra::TagId(tag)));
+
+	std::transform(begin(dataset), end(dataset), std::back_inserter(tags), [&](auto& v)
+	{
+		auto tagId = imebra::TagId(tag);
+		return tag_to_wstring(tagId) + L" " + readTag(*v, tagId);
+	});
+	std::sort(begin(tags), end(tags));
+	std::unique_copy(begin(tags), end(tags), std::back_inserter(result));
+
+	return result;
 }

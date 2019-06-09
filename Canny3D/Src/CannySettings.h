@@ -9,7 +9,12 @@ class CannySettings : public QWidget
 
 public:
 	CannySettings(QWidget *parent = Q_NULLPTR);
-	~CannySettings();
+
+public slots:
+	void setVOICenterMinimum(int value);
+	void setVOICenterMaximum(int value);
+	void setVOIWidthMinimum(int value);
+	void setVOIWidthMaximum(int value);
 
 private:
 	Ui::CannySettings ui;

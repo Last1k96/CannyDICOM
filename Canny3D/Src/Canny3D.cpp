@@ -1,7 +1,7 @@
 #include "Canny3D.h"
 #include <QFileDialog>
 #include <QDialog>
-#include <QImageReader>
+#include <QGroupBox>
 #include <QImageWriter>
 #include <qmessagebox.h>
 #include <QAction>
@@ -9,7 +9,6 @@
 #include "DicomViewer.h"
 #include "QGLMeshViewer.h"
 #include "DicomTreeItem.h"
-#include <fstream>
 
 Canny3D::Canny3D(QWidget* parent)
 	: QMainWindow(parent)
@@ -38,8 +37,6 @@ std::vector<ImebraImage> Canny3D::loadFiles(const QString& fileName)
 		                              QString::fromStdString(e.what())));
 		return {};
 	}
-
-	//setWindowFilePath(fileName);
 
 	return images;
 }
@@ -165,17 +162,13 @@ std::optional<std::vector<ImebraImage>> Canny3D::initiateOpenDialog(QString cons
 void Canny3D::open()
 {
 	auto images = initiateOpenDialog(QString::fromWCharArray(L"Открыть файл"), QFileDialog::AnyFile);
-	if (images)
-		updateTree(std::move(*images));
-	//addNewTab(std::move(images));
+	if (images)	updateTree(std::move(*images));
 }
 
 void Canny3D::openFolder()
 {
 	auto images = initiateOpenDialog(QString::fromWCharArray(L"Открыть папку"), QFileDialog::Directory);
-	if (images)
-		updateTree(std::move(*images));
-	//addNewTab(std::move(images));
+	if (images)	updateTree(std::move(*images));
 }
 
 using It = std::vector<ImebraImage>::iterator;

@@ -6,6 +6,25 @@ CannySettings::CannySettings(QWidget *parent)
 	ui.setupUi(this);
 }
 
-CannySettings::~CannySettings()
+void CannySettings::setVOICenterMinimum(int value)
 {
+	ui.centerVal->setMinimum(value);
+	ui.centerSlider->setMinimum(value);
+}
+void CannySettings::setVOICenterMaximum(int value)
+{
+	ui.centerVal->setMaximum(value);
+	ui.centerSlider->setMaximum(value);
+}
+
+void CannySettings::setVOIWidthMinimum(int value)
+{
+	ui.widthVal->setMinimum(value);
+	ui.widthSlider->setMinimum(value);
+}
+
+void CannySettings::setVOIWidthMaximum(int value)
+{
+	ui.widthVal->setMaximum(value);
+	ui.widthSlider->setMaximum(value);
 }

@@ -84,4 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\patient.ico" />
+    <Image Include="Resources\series.ico" />
+    <Image Include="Resources\study.ico" />
+  </ItemGroup>
 </Project>

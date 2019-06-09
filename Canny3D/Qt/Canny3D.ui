@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>859</width>
-    <height>592</height>
+    <height>434</height>
    </rect>
   </property>
   <property name="baseSize">
@@ -19,6 +19,12 @@
   <property name="windowTitle">
    <string>Canny3D</string>
   </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
+  </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
@@ -27,6 +33,21 @@
     </sizepolicy>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
@@ -62,75 +83,99 @@
         <attribute name="title">
          <string>Tab 1</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="DicomViewer" name="widget" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSlider" name="horizontalSlider">
+          <widget class="QSplitter" name="splitter_2">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Vertical</enum>
            </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <property name="sizeConstraint">
-            <enum>QLayout::SetMinimumSize</enum>
-           </property>
-           <item>
-            <widget class="QGroupBox" name="groupBox">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>150</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>Настройки</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_2">
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <property name="sizeConstraint">
-              <enum>QLayout::SetMinimumSize</enum>
-             </property>
+           <widget class="QWidget" name="">
+            <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="DicomViewer" name="widget" native="true">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="text">
-                <string>Построить</string>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
                </property>
               </widget>
              </item>
             </layout>
-           </item>
-          </layout>
+           </widget>
+           <widget class="QWidget" name="">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="CannySettings" name="widget_2" native="true">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>250</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <property name="sizeConstraint">
+                <enum>QLayout::SetMinimumSize</enum>
+               </property>
+               <item>
+                <spacer name="verticalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Vertical</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::MinimumExpanding</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButton_2">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Расчитать 3D поверхность</string>
+                 </property>
+                 <property name="checkable">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -189,6 +234,12 @@
    <class>DicomViewer</class>
    <extends>QWidget</extends>
    <header>DicomViewer.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CannySettings</class>
+   <extends>QWidget</extends>
+   <header>CannySettings.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -41,7 +41,7 @@ bool DicomViewer::selectImage(int index)
 	return true;
 }
 
-cv::Mat DicomViewer::computeImage()
+cv::Mat DicomViewer::computeImage() const
 {
 	return imebraToMat(images[idx]);
 }

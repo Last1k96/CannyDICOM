@@ -9,12 +9,13 @@
 #include "DicomViewer.h"
 #include "QGLMeshViewer.h"
 #include "DicomTreeItem.h"
+#include <fstream>
 
 Canny3D::Canny3D(QWidget* parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
-	
+
 	connect(ui.openAction, &QAction::triggered, this, &Canny3D::open);
 	connect(ui.openFolderAction, &QAction::triggered, this, &Canny3D::openFolder);
 	connect(ui.treeWidget, &QTreeWidget::expanded, this, &Canny3D::adjustColumns);
@@ -48,8 +49,8 @@ void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 	auto images = dynamic_cast<DicomTreeItem*>(item)->images;
 	const auto count = images.size();
 	if (count == 0) return;
-	auto const tabName = QString::fromStdWString(images.front().tags.groupName[0]) 
-				+ " (" + QString::fromStdWString(images.front().tags.groupName[2]) + ")";
+	auto const tabName = QString::fromStdWString(images.front().tags.groupName[0])
+		+ " (" + QString::fromStdWString(images.front().tags.groupName[2]) + ")";
 
 	auto tab = new QWidget();
 	tab->setObjectName(QString::fromUtf8("tab"));
@@ -106,11 +107,12 @@ void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 	horizontalLayout_2->addLayout(verticalLayout_2);
 
 	verticalLayout->addLayout(horizontalLayout_2);
-	
+
 	horizontalSlider->setRange(0, count - 1);
 	connect(horizontalSlider, &QSlider::valueChanged, widget, &DicomViewer::selectImage);
 	connect(widget, &DicomViewer::imageChanged, horizontalSlider, &QSlider::setValue);
-	connect(pushButton_2, &QPushButton::pressed, [this, widget]() {
+	connect(pushButton_2, &QPushButton::pressed, [this, widget]()
+	{
 		this->addNewTab3D(widget->images);
 	});
 
@@ -125,7 +127,7 @@ void Canny3D::addNewTab3D(std::vector<ImebraImage> const& images) const
 	auto widget = new QGLMeshViewer(tab);
 	widget->setObjectName(QString::fromUtf8("widget"));
 	auto const tabName = QString::fromStdWString(images.front().tags.groupName[0])
-				+ " (" + QString::fromStdWString(images.front().tags.groupName[2]) + ") 3D";
+		+ " (" + QString::fromStdWString(images.front().tags.groupName[2]) + ") 3D";
 
 	ui.tabWidget->addTab(tab, tabName);
 
@@ -182,14 +184,10 @@ static void createTree(QTreeWidgetItem* parent, It begin, It end, int tagId = 0)
 {
 	if (tagId == 3)
 	{
-		std::sort(begin, end, [](ImebraImage& lhs, ImebraImage& rhs)
-		{
-			return lhs.tags.instanceNumber < rhs.tags.instanceNumber;
-		});
 		return;
 	}
 
-	std::sort(begin, end, [&](ImebraImage& lhs, ImebraImage& rhs)
+	std::stable_sort(begin, end, [&](ImebraImage const& lhs, ImebraImage const& rhs)
 	{
 		return lhs.tags.groupBy[tagId] < rhs.tags.groupBy[tagId];
 	});
@@ -198,13 +196,22 @@ static void createTree(QTreeWidgetItem* parent, It begin, It end, int tagId = 0)
 	while (right != end)
 	{
 		auto left = right;
-		right = std::adjacent_find(left, end, [&](ImebraImage& lhs, ImebraImage& rhs)
+		right = std::lower_bound(left, end, *left, [&](ImebraImage const& lhs, ImebraImage const& rhs)
 		{
-			return lhs.tags.groupBy[tagId] != rhs.tags.groupBy[tagId];
+			return lhs.tags.groupBy[tagId] == rhs.tags.groupBy[tagId];
 		});
-		if (right != end) ++right;
 
-		auto child = tagId == 2 ? new DicomTreeItem(parent, left, right) : new DicomTreeItem(parent, left, left);
+		auto child = [&]
+		{
+			if (tagId < 2) return new DicomTreeItem(parent, left, left);
+
+			std::sort(left, right, [](ImebraImage const& lhs, ImebraImage const& rhs)
+			{
+				return lhs.tags.sliceLocation < rhs.tags.sliceLocation;
+			});
+			return new DicomTreeItem(parent, left, right);
+		}();
+
 		if (tagId == 0)
 		{
 			child->setIcon(0, QIcon("Resources/patient.ico"));
@@ -243,6 +250,12 @@ void Canny3D::updateTree(std::vector<ImebraImage>&& images)
 			study->setText(0, study->text(0) + QString::fromStdWString(str));
 		}
 	}
+
+	auto model = tree->model();
+	auto indexes = model->match(model->index(0, 0), Qt::DisplayRole, "*", -1, Qt::MatchWildcard | Qt::MatchRecursive);
+	foreach(QModelIndex index, indexes)
+		tree->expand(index);
+
 	for (auto i = 0; i < tree->columnCount(); ++i)
 	{
 		tree->resizeColumnToContents(i);

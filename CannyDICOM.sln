@@ -9,8 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imebra-test", "imebra-test\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtGuiDicomViewer", "QtGuiDicomViewer\QtGuiDicomViewer.vcxproj", "{A46D0F27-25F7-4EE3-8603-5ABBDD055915}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtImageViewer", "QtImageViewer\QtImageViewer.vcxproj", "{4937E1A7-3BBD-43EE-8420-DD01E0E85460}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -29,10 +27,6 @@ Global
 		{A46D0F27-25F7-4EE3-8603-5ABBDD055915}.Debug|x64.Build.0 = Debug|x64
 		{A46D0F27-25F7-4EE3-8603-5ABBDD055915}.Release|x64.ActiveCfg = Release|x64
 		{A46D0F27-25F7-4EE3-8603-5ABBDD055915}.Release|x64.Build.0 = Release|x64
-		{4937E1A7-3BBD-43EE-8420-DD01E0E85460}.Debug|x64.ActiveCfg = Debug|x64
-		{4937E1A7-3BBD-43EE-8420-DD01E0E85460}.Debug|x64.Build.0 = Debug|x64
-		{4937E1A7-3BBD-43EE-8420-DD01E0E85460}.Release|x64.ActiveCfg = Release|x64
-		{4937E1A7-3BBD-43EE-8420-DD01E0E85460}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

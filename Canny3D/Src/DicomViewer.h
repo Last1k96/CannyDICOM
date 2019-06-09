@@ -16,7 +16,7 @@ public:
 [[nodiscard]] size_t imageCount() const;
 [[nodiscard]] size_t index() const;
 
-	cv::Mat computeImage();
+	cv::Mat computeImage() const;
 	std::vector<ImebraImage> const images{};
 
 private:	

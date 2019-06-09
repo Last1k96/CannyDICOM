@@ -6,8 +6,8 @@
 #include <QImage>
 #include <string>
 #include <optional>
+#include <variant>
 namespace fs = std::experimental::filesystem;
-
 
 static void removeUnwantedEdges(cv::Mat canny, cv::Mat original, int threshold = 170)
 {
@@ -110,19 +110,19 @@ struct VOI
 
 struct treeTags
 {
-	std::vector<int64_t> groupBy{};
-	int64_t instanceNumber{};
+	std::vector<std::wstring> groupBy{};
+	float sliceLocation{};
 
 	std::vector<std::wstring> groupName{};
 
 	treeTags(imebra::DataSet* const dataset)
 		: groupBy
 		  {
-			  std::stoll(readTag(dataset, imebra::tagId_t::PatientID_0010_0020)),
-			  std::stoll(readTag(dataset, imebra::tagId_t::StudyID_0020_0010)),
-			  std::stoll(readTag(dataset, imebra::tagId_t::SeriesNumber_0020_0011)),
+			  readTag(dataset, imebra::tagId_t::PatientID_0010_0020),
+			  readTag(dataset, imebra::tagId_t::StudyInstanceUID_0020_000D),
+			  readTag(dataset, imebra::tagId_t::SeriesNumber_0020_0011),
 		  }
-		  , instanceNumber{std::stoll(readTag(dataset, imebra::tagId_t::InstanceNumber_0020_0013))}
+		  , sliceLocation{std::stof(readTag(dataset, imebra::tagId_t::SliceLocation_0020_1041))}
 		  , groupName
 		  {
 			  readTag(dataset, imebra::tagId_t::PatientName_0010_0010),
@@ -147,7 +147,7 @@ struct ImebraImage
 	treeTags tags{};
 
 	explicit ImebraImage(imebra::DataSet* const loadedDataSet)
-		: image{std::shared_ptr<imebra::Image>(loadedDataSet->getImage(0))}
+		: image{std::shared_ptr<imebra::Image>(loadedDataSet->getImageApplyModalityTransform(0))}
 		  , tags{loadedDataSet}
 	{
 		if (!imebra::ColorTransformsFactory::isMonochrome(image->getColorSpace()))
@@ -160,6 +160,13 @@ struct ImebraImage
 			voi = VOI{vois[0].center, vois[0].width};
 		}
 	}
+
+	ImebraImage() = default;
+	ImebraImage(ImebraImage const&) = default;
+	ImebraImage& operator=(ImebraImage const&) = default;
+	ImebraImage(ImebraImage&&) = default;
+	ImebraImage& operator=(ImebraImage&&) = default;
+	~ImebraImage() = default;
 };
 
 static cv::Mat applyVoilutTransform(ImebraImage const& data, std::optional<VOI> voi = {})
@@ -229,21 +236,28 @@ static void sortDatasetsByTagid(std::vector<std::unique_ptr<imebra::DataSet>>& v
 
 static std::vector<ImebraImage> readFolder(const std::wstring& path)
 {
-	std::vector<ImebraImage> data{};
+	std::vector<std::wstring> files;
+	for (auto const& entry : fs::recursive_directory_iterator(path))
+		files.push_back(entry.path());
 
-	for (auto const& entry : fs::directory_iterator(path))
+	std::vector<ImebraImage> result(files.size());
+#pragma omp parallel for
+	for (int i = 0; i < files.size(); i++)
 	{
 		try
 		{
-			auto dataset = std::unique_ptr<imebra::DataSet>(imebra::CodecFactory::load(entry.path()));
-			data.emplace_back(dataset.get());
+			result[i] = ImebraImage(std::unique_ptr<imebra::DataSet>(imebra::CodecFactory::load(files[i])).get());
 		}
 		catch (...)
 		{
 		}
 	}
-
-	return data;
+	const auto it = std::remove_if(begin(result), end(result), [](ImebraImage const& img)
+	{
+		return !img.image;
+	});
+	result.resize(std::distance(begin(result), it));
+	return result;
 }
 
 static QImage matToQImage(cv::Mat img)
@@ -265,16 +279,16 @@ static cv::Mat imebraToMat(ImebraImage const& input)
 
 static std::vector<ImebraImage> loadData(std::filesystem::path const& path)
 {
-	auto images = std::vector<ImebraImage>{};
-
-	if (is_regular_file(path))
+	return [&]() -> std::vector<ImebraImage>
 	{
-		images.push_back(readFile(path));
-	}
-	else if (is_directory(path))
-	{
-		images = readFolder(path);
-	}
-
-	return images;
+		if (is_regular_file(path))
+		{
+			return {readFile(path)};
+		}
+		if (is_directory(path))
+		{
+			return readFolder(path);
+		}
+		return {};
+	}();
 }

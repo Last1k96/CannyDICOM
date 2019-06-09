@@ -331,16 +331,16 @@ static void print_series_tag_difference()
 static void union_tags_in_all_datasets()
 {
 	std::vector<std::wstring> paths = {
-		L"d:/DICOM/Panasenko/DICOM",
-		L"d:/DICOM/Prohorov-after/DICOM/D201504/DD2409",
-		L"d:/DICOM/Kalinin-before/DICOM",
-		L"d:/DICOM/korotkov/DICOM/17020708/29510000",
+		//L"d:/DICOM/Panasenko/DICOM",
+		//L"d:/DICOM/Prohorov-after/DICOM/D201504/DD2409",
+		//L"d:/DICOM/Kalinin-before/DICOM",
+		//L"d:/DICOM/korotkov/DICOM/17020708/29510000",
 		L"d:/DICOM/korotkov/DICOM/17020708/29510001",
-		L"d:/DICOM/Krupin-before/DICOM/D201508/DD1014",
-		L"d:/DICOM/Latishev-after1operation/DICOM",
-		L"d:/DICOM/Latishev-after2operation-CBCT/Data",
-		L"d:/DICOM/Lukin-after1operation/DICOM/D201111/DD1111",
-		L"d:/DICOM/Lukin-after2operation/DICOM/D201211/DD1512"
+		//L"d:/DICOM/Krupin-before/DICOM/D201508/DD1014",
+		//L"d:/DICOM/Latishev-after1operation/DICOM",
+		//L"d:/DICOM/Latishev-after2operation-CBCT/Data",
+		//L"d:/DICOM/Lukin-after1operation/DICOM/D201111/DD1111",
+		//L"d:/DICOM/Lukin-after2operation/DICOM/D201211/DD1512"
 	};
 	auto result = std::vector<std::wstring>{};
 	for (auto const& path : paths)
@@ -369,7 +369,7 @@ static void union_tags_in_all_datasets()
 	}
 	std::cout << "Tags in all datasets:\n";
 	std::copy(begin(result), end(result), std::ostream_iterator<std::wstring, wchar_t>(std::wcout, L"\n"));
-	std::cout << "\n\n";
+	std::cout << "\n" << result.size();
 }
 
 static std::vector<std::wstring> different_values_of_tag(std::vector<std::unique_ptr<imebra::DataSet>> const& dataset,

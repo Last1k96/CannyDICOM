@@ -5,7 +5,6 @@
 class DicomTreeItem : public QTreeWidgetItem
 {
 	using It = std::vector<ImebraImage>::iterator;
-	
 public:
 	std::vector<ImebraImage> const images;
 

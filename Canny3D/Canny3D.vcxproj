@@ -60,6 +60,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/arch:AVX2 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -93,6 +94,7 @@
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/arch:AVX2 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,6 +119,7 @@
     </QtRcc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Src\CannySettings.cpp" />
     <ClCompile Include="Src\DicomTreeItem.cpp" />
     <ClCompile Include="Src\Canny3D.cpp" />
     <ClCompile Include="Src\main.cpp" />
@@ -127,6 +130,7 @@
     <QtMoc Include="Src\Canny3D.h" />
   </ItemGroup>
   <ItemGroup>
+    <QtUic Include="Qt\CannySettings.ui" />
     <QtUic Include="Qt\Canny3D.ui" />
   </ItemGroup>
   <ItemGroup>
@@ -134,6 +138,10 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="Src\DicomViewer.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>
+    </QtMoc>
+    <QtMoc Include="Src\CannySettings.h">
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>
     </QtMoc>

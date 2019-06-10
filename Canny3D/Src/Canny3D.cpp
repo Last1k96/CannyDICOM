@@ -39,9 +39,10 @@ std::vector<ImebraImage> Canny3D::loadFiles(const QString& fileName)
 		                              QString::fromStdString(e.what())));
 		return {};
 	}
-
+	
 	return images;
 }
+
 // Скопировал из ui_Canny3D
 void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 {
@@ -118,13 +119,13 @@ void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 	pushButton_2->setText(QString::fromWCharArray(L"3D"));
 	connect(horizontalSlider, &QSlider::valueChanged, viewer, &DicomViewer::selectImage);
 	connect(viewer, &DicomViewer::imageChanged, horizontalSlider, &QSlider::setValue);
-	connect(pushButton_2, &QPushButton::pressed, [this, viewer, settings]()
+	connect(pushButton_2, &QPushButton::pressed, [this, viewer]()
 	{
 		auto& images = viewer->images;
 		auto const tabName = QString::fromStdWString(images.front().tags.groupName[0])
 			+ " (" + QString::fromStdWString(images.front().tags.groupName[2]) + ") 3D";
 		
-		//auto config = settings->currentSettings();
+		// convert to cv::Mat
 		auto edges = std::vector<cv::Mat>(images.size());
 #pragma omp parallel for
 		for (int i = 0; i < images.size(); i++)
@@ -132,7 +133,17 @@ void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 			edges[i] = viewer->computeImage(i);
 		}
 
-		this->addNewTab3D(std::move(edges), tabName);
+		// get size in mm
+		auto const& image = images[0].image;
+
+		auto sizeInMillimeters = std::tuple
+		{
+			image->getWidthMm() / image->getWidth(),
+			image->getHeightMm() / image->getHeight(),
+			std::fabs(images[0].tags.sliceLocation - images[1].tags.sliceLocation)
+		};
+
+		this->addNewTab3D(std::move(edges), sizeInMillimeters, tabName);
 	});
 	connect(settings, &CannySettings::settingsChanged, viewer, &DicomViewer::setSettings);
 	ui.tabWidget->addTab(tab, tabName);
@@ -151,7 +162,7 @@ void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 	settings->setUiValues(s);
 }
 
-void Canny3D::addNewTab3D(std::vector<cv::Mat> images, QString const& tabName) const
+void Canny3D::addNewTab3D(std::vector<cv::Mat> images, std::tuple<double, double, double> xyzInMillimeters, QString const& tabName) const
 {
 	auto tab = new QWidget();
 	auto widget = new QGLMeshViewer(tab, std::move(images));

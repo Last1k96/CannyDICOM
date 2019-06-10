@@ -1,22 +1,25 @@
 #pragma once
+#include <vector>
+#include <opencv2/opencv.hpp>
 #include <QGLViewer/qglviewer.h>
-#include <Qstring>
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <opencv2/core/mat.hpp>
+#include "dualmc.h"
+#include "DualMarchingCubes.h"
+#include <CGAL/Surface_mesh/Surface_mesh.h>
 
-typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-typedef K::Point_2 Point_2;
-typedef std::vector<Point_2> Points;
+typedef CGAL::Simple_cartesian<double> K;
+typedef K::Point_3 Point;
+typedef CGAL::Surface_mesh<Point> Mesh;
 
 class QGLMeshViewer : public QGLViewer
 {
-	std::vector<cv::Mat> edges;
 public:
-	Points points, result;
-
-	QGLMeshViewer(QWidget* parent, std::vector<cv::Mat> edges);
+	QGLMeshViewer(QWidget* parent, std::vector<cv::Mat> const& images);
 
 protected:
 	void draw() override;
 	void init() override;
+
+private:
+	DualMarchingCubes mc;
+	Mesh m;
 };

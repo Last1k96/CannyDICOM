@@ -20,18 +20,17 @@ void print(std::vector<std::wstring> const& v)
 
 int main(int argc, const char* argv[])
 {
-
-	auto v = std::vector<int>{ 1, 2, 3, 4, 5 };
-	auto it = v.begin() + 1;
-	std::reverse(begin(v), end(v));
-	std::cout << *it;
+	auto t = imebra::tagId_t::SliceLocation_0020_1041;
+	auto s = readFolder(L"d:/DICOM/korotkov/DICOM/17020708/29510000");
+	auto t1 = s[0]->getUnicodeString(imebra::TagId(t), 0);
+	auto t2 = s[1]->getUnicodeString(imebra::TagId(t), 0);
+	std::cout << std::fabs(std::stod(t1)- std::stod(t2)) << '\n';
 	return 0;
-
 	std::vector<std::wstring> paths = {
-		//L"d:/DICOM/Panasenko/DICOM",
+		L"d:/DICOM/Panasenko/DICOM",
 		//L"d:/DICOM/Prohorov-after/DICOM/D201504/DD2409",
 		//L"d:/DICOM/Kalinin-before/DICOM",
-		L"d:/DICOM/korotkov/DICOM/17020708/29510000",
+		//L"d:/DICOM/korotkov/DICOM/17020708/29510000",
 		//L"d:/DICOM/korotkov/DICOM/17020708/29510001",
 		//L"d:/DICOM/Krupin-before/DICOM/D201508/DD1014",
 		//L"d:/DICOM/Latishev-after1operation/DICOM",

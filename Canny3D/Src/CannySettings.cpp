@@ -54,11 +54,11 @@ Settings CannySettings::currentSettings() const
 
 void CannySettings::setUiValues(Settings const& s) const
 {
-	ui.centerMin->setValue(-300); // на случай отрицательных значений
+	ui.centerMin->setValue(-300); 
 	ui.centerMax->setValue(2000);
 	ui.centerVal->setValue(s.voiCenter);
 	
-	ui.widthMin->setValue(2); // на случай отрицательных значений
+	ui.widthMin->setValue(2); 
 	ui.widthMax->setValue(6000);
 	ui.widthVal->setValue(s.voiWidth);
 

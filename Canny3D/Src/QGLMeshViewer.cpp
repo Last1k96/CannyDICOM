@@ -1,5 +1,10 @@
 #include "QGLMeshViewer.h"
 
+QGLMeshViewer::QGLMeshViewer(QWidget* parent, std::vector<cv::Mat> edges)
+	: edges(std::move(edges))
+{
+}
+
 void QGLMeshViewer::draw()
 {
 	glColor3f(1.0f, 0.0f, 0.0f);

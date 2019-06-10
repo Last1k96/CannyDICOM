@@ -17,7 +17,7 @@ DicomViewer::DicomViewer(QWidget* parent, std::vector<ImebraImage>&& data)
 void DicomViewer::updateImage()
 {
 	if (images.empty()) return;
-	currentImage = computeImage();
+	currentImage = computeCurrentImage();
 	setPixmap(QPixmap::fromImage(matToQImage(currentImage)));
 }
 
@@ -41,9 +41,42 @@ bool DicomViewer::selectImage(int index)
 	return true;
 }
 
-cv::Mat DicomViewer::computeImage() const
+void DicomViewer::setSettings(Settings const& s)
 {
-	return imebraToMat(images[idx]);
+	settings = s;
+	updateImage();
+}
+
+cv::Mat DicomViewer::computeImage(int index) const
+{
+	cv::Mat result;
+
+	auto const imebraImage = images[index];
+
+	auto const voilut = applyVoilutTransform(imebraImage, VOI{ settings.voiCenter, settings.voiWidth });
+	if (settings.step == Steps::VOI)
+	{
+		auto const original = cv::Mat(applyVoilutTransform(imebraImage));
+		hconcat(original, voilut, result);
+		return result;
+	}
+
+	auto const blured = gauss(voilut, settings.gaussKernel, settings.gaussSigma);
+	if (settings.step == Steps::Gauss)
+	{
+		hconcat(voilut, blured, result);
+		return result;
+	}
+	//auto const thld = toZeroThreshold(blured);
+	auto const edges = canny(blured, Threshold{ settings.cannyLow, settings.cannyHigh });
+	//removeUnwantedEdges(edges, original);
+	hconcat(blured, edges, result);
+	return result;
+}
+
+cv::Mat DicomViewer::computeCurrentImage() const
+{
+	return computeImage(idx);
 }
 
 void DicomViewer::setPixmap(const QPixmap& pm)

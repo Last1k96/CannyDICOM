@@ -7,6 +7,7 @@
 #include <string>
 #include <optional>
 #include <variant>
+class CannySettings;
 namespace fs = std::experimental::filesystem;
 
 static void removeUnwantedEdges(cv::Mat canny, cv::Mat original, int threshold = 170)
@@ -68,11 +69,16 @@ static std::pair<int, int> otsuThreshold(cv::Mat img)
 	return {0.5 * threshold, threshold};
 }
 
-static cv::Mat canny(cv::Mat img, std::optional<std::pair<int, int>> threshold = {})
+struct Threshold
+{
+	int low;
+	int high;
+};
+
+static cv::Mat canny(cv::Mat img, Threshold threshold = {100, 200})
 {
 	cv::Mat edges;
-	auto const thld = 100;
-	Canny(img, edges, thld, 180, 3, true);
+	Canny(img, edges, threshold.low, threshold.high, 3, true);
 	return edges;
 }
 
@@ -104,9 +110,10 @@ static std::wstring readTag(imebra::DataSet* const dataset, const imebra::tagId_
 
 struct VOI
 {
-	double center;
-	double width;
+	int center;
+	int width;
 };
+
 
 struct treeTags
 {
@@ -157,7 +164,7 @@ struct ImebraImage
 
 		if (auto const vois = loadedDataSet->getVOIs(); !vois.empty())
 		{
-			voi = VOI{vois[0].center, vois[0].width};
+			voi = VOI{static_cast<int>(vois[0].center), static_cast<int>(vois[0].width)};
 		}
 	}
 
@@ -291,4 +298,11 @@ static std::vector<ImebraImage> loadData(std::filesystem::path const& path)
 		}
 		return {};
 	}();
+}
+
+
+
+static cv::Mat buildImage(cv::Mat original, CannySettings const& settings)
+{
+	
 }

@@ -15,6 +15,8 @@ Canny3D::Canny3D(QWidget* parent)
 {
 	ui.setupUi(this);
 
+	ui.tabWidget->removeTab(0);
+
 	connect(ui.openAction, &QAction::triggered, this, &Canny3D::open);
 	connect(ui.openFolderAction, &QAction::triggered, this, &Canny3D::openFolder);
 	connect(ui.treeWidget, &QTreeWidget::expanded, this, &Canny3D::adjustColumns);
@@ -40,7 +42,7 @@ std::vector<ImebraImage> Canny3D::loadFiles(const QString& fileName)
 
 	return images;
 }
-
+// Скопировал из ui_Canny3D
 void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 {
 	auto images = dynamic_cast<DicomTreeItem*>(item)->images;
@@ -49,83 +51,110 @@ void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 	auto const tabName = QString::fromStdWString(images.front().tags.groupName[0])
 		+ " (" + QString::fromStdWString(images.front().tags.groupName[2]) + ")";
 
+	/// ui_Canny3D start
 	auto tab = new QWidget();
-	tab->setObjectName(QString::fromUtf8("tab"));
-	auto verticalLayout = new QVBoxLayout(tab);
+	tab = new QWidget();
+	auto horizontalLayout_2 = new QHBoxLayout(tab);
+	horizontalLayout_2->setSpacing(6);
+	horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
+	auto splitter_2 = new QSplitter(tab);
+	splitter_2->setOrientation(Qt::Vertical);
+	auto layoutWidget = new QWidget(splitter_2);
+	auto verticalLayout = new QVBoxLayout(layoutWidget);
 	verticalLayout->setSpacing(6);
 	verticalLayout->setContentsMargins(11, 11, 11, 11);
-	verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-	auto widget = new DicomViewer(tab, std::move(images));
-	widget->setObjectName(QString::fromUtf8("widget"));
-	QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+	verticalLayout->setSizeConstraint(QLayout::SetMinimumSize);
+	verticalLayout->setContentsMargins(0, 0, 0, 0);
+	auto viewer = new DicomViewer(tab, std::move(images)); // измененный конструктор
+	QSizePolicy sizePolicy3(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	sizePolicy3.setHorizontalStretch(0);
 	sizePolicy3.setVerticalStretch(0);
-	sizePolicy3.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
-	widget->setSizePolicy(sizePolicy3);
+	sizePolicy3.setHeightForWidth(viewer->sizePolicy().hasHeightForWidth());
+	viewer->setSizePolicy(sizePolicy3);
 
-	verticalLayout->addWidget(widget);
+	verticalLayout->addWidget(viewer);
 
-	auto horizontalSlider = new QSlider(tab);
-	horizontalSlider->setObjectName(QString::fromUtf8("horizontalSlider"));
-	horizontalSlider->setOrientation(Qt::Horizontal);
-
-	verticalLayout->addWidget(horizontalSlider);
-
-	auto horizontalLayout_2 = new QHBoxLayout();
-	horizontalLayout_2->setSpacing(0);
-	horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
-	horizontalLayout_2->setSizeConstraint(QLayout::SetMinimumSize);
-	auto groupBox = new QGroupBox(tab);
-	groupBox->setObjectName(QString::fromUtf8("groupBox"));
-	QSizePolicy sizePolicy4(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+	auto horizontalLayout_3 = new QHBoxLayout();
+	horizontalLayout_3->setSpacing(6);
+	auto horizontalSlider = new QSlider(layoutWidget);
+	QSizePolicy sizePolicy4(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	sizePolicy4.setHorizontalStretch(0);
 	sizePolicy4.setVerticalStretch(0);
-	sizePolicy4.setHeightForWidth(groupBox->sizePolicy().hasHeightForWidth());
-	groupBox->setSizePolicy(sizePolicy4);
-	groupBox->setMinimumSize(QSize(0, 150));
+	sizePolicy4.setHeightForWidth(horizontalSlider->sizePolicy().hasHeightForWidth());
+	horizontalSlider->setSizePolicy(sizePolicy4);
+	horizontalSlider->setOrientation(Qt::Horizontal);
+	horizontalSlider->setInvertedAppearance(false);
+	horizontalSlider->setInvertedControls(false);
 
-	horizontalLayout_2->addWidget(groupBox);
+	horizontalLayout_3->addWidget(horizontalSlider);
 
-	auto verticalLayout_2 = new QVBoxLayout();
-	verticalLayout_2->setSpacing(0);
-	verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-	verticalLayout_2->setSizeConstraint(QLayout::SetMinimumSize);
-	auto pushButton_2 = new QPushButton(tab);
-	pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
-	pushButton_2->setText(QString::fromWCharArray(L"Построить"));
-	QSizePolicy sizePolicy5(QSizePolicy::Fixed, QSizePolicy::Preferred);
+	auto pushButton_2 = new QPushButton(layoutWidget);
+	QSizePolicy sizePolicy5(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	sizePolicy5.setHorizontalStretch(0);
 	sizePolicy5.setVerticalStretch(0);
 	sizePolicy5.setHeightForWidth(pushButton_2->sizePolicy().hasHeightForWidth());
 	pushButton_2->setSizePolicy(sizePolicy5);
+	pushButton_2->setMinimumSize(QSize(30, 30));
+	pushButton_2->setMaximumSize(QSize(30, 30));
+	QFont font;
+	font.setPointSize(12);
+	pushButton_2->setFont(font);
+	pushButton_2->setCheckable(false);
 
-	verticalLayout_2->addWidget(pushButton_2);
+	horizontalLayout_3->addWidget(pushButton_2);
 
-	horizontalLayout_2->addLayout(verticalLayout_2);
+	verticalLayout->addLayout(horizontalLayout_3);
 
-	verticalLayout->addLayout(horizontalLayout_2);
+	splitter_2->addWidget(layoutWidget);
+	auto settings = new CannySettings(splitter_2);
+	settings->setMinimumSize(QSize(0, 167));
+	settings->setMaximumSize(QSize(16777215, 167));
+	splitter_2->addWidget(settings);
+
+	horizontalLayout_2->addWidget(splitter_2);
+	/// ui_Canny3D end
 
 	horizontalSlider->setRange(0, count - 1);
-	connect(horizontalSlider, &QSlider::valueChanged, widget, &DicomViewer::selectImage);
-	connect(widget, &DicomViewer::imageChanged, horizontalSlider, &QSlider::setValue);
-	connect(pushButton_2, &QPushButton::pressed, [this, widget]()
+	pushButton_2->setText(QString::fromWCharArray(L"3D"));
+	connect(horizontalSlider, &QSlider::valueChanged, viewer, &DicomViewer::selectImage);
+	connect(viewer, &DicomViewer::imageChanged, horizontalSlider, &QSlider::setValue);
+	connect(pushButton_2, &QPushButton::pressed, [this, viewer, settings]()
 	{
-		this->addNewTab3D(widget->images);
-	});
+		auto& images = viewer->images;
+		auto const tabName = QString::fromStdWString(images.front().tags.groupName[0])
+			+ " (" + QString::fromStdWString(images.front().tags.groupName[2]) + ") 3D";
+		
+		//auto config = settings->currentSettings();
+		auto edges = std::vector<cv::Mat>(images.size());
+#pragma omp parallel for
+		for (int i = 0; i < images.size(); i++)
+		{
+			edges[i] = viewer->computeImage(i);
+		}
 
+		this->addNewTab3D(std::move(edges), tabName);
+	});
+	connect(settings, &CannySettings::settingsChanged, viewer, &DicomViewer::setSettings);
 	ui.tabWidget->addTab(tab, tabName);
+
+	// updateUI
+	if (viewer->images.empty()) return;
+	auto const& image = viewer->images[0];
+	auto s = Settings();
+	s.voiCenter = (image.voi) ? image.voi->center : 300;
+	s.voiWidth = (image.voi) ? image.voi->width : 2500;
+	s.gaussKernel = 5;
+	s.gaussSigma = 1.0;
+	s.cannyLow = 80;
+	s.cannyHigh = 220;
+	s.step = Steps::VOI;
+	settings->setUiValues(s);
 }
 
-void Canny3D::addNewTab3D(std::vector<ImebraImage> const& images) const
+void Canny3D::addNewTab3D(std::vector<cv::Mat> images, QString const& tabName) const
 {
 	auto tab = new QWidget();
-	tab->setObjectName(QString::fromUtf8("tab3D"));
-
-	auto widget = new QGLMeshViewer(tab);
-	widget->setObjectName(QString::fromUtf8("widget"));
-	auto const tabName = QString::fromStdWString(images.front().tags.groupName[0])
-		+ " (" + QString::fromStdWString(images.front().tags.groupName[2]) + ") 3D";
-
+	auto widget = new QGLMeshViewer(tab, std::move(images));
 	ui.tabWidget->addTab(tab, tabName);
 
 	auto verticalLayout = new QVBoxLayout(tab);

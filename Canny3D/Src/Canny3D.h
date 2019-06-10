@@ -15,10 +15,10 @@ public:
 	std::vector<ImebraImage> loadFiles(const QString&);
 		
 	void addNewTab(QTreeWidgetItem* item, int column) const;
-	void addNewTab3D(std::vector<ImebraImage> const& images) const;
+	void addNewTab_old(QTreeWidgetItem* item, int column) const;
+	void addNewTab3D(std::vector<cv::Mat> images, QString const& tabName) const;
 	void updateTree(std::vector<ImebraImage>&& images);
 	void adjustColumns(QModelIndex const& index);
-
 	std::optional<std::vector<ImebraImage>> initiateOpenDialog(QString const& name, QFileDialog::FileMode type);
 
 private slots:
@@ -27,5 +27,5 @@ private slots:
 
 private:
 	Ui::Canny3DClass ui;
-
 };
+

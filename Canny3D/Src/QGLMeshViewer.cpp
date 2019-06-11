@@ -50,12 +50,16 @@ void QGLMeshViewer::draw()
 		auto& v3 = mc.vertices[q.i2];
 		auto& v4 = mc.vertices[q.i3];
 
-		for (auto v : { v1, v2, v3, v3, v4, v1 }) {
+		for (auto v : { v1, v2, v3 }) {
 			glVertex3f(v.x, v.y, v.z);
-			auto& norm = mc.normals[i];
+			auto& norm = mc.normals[2 * i];
 			glNormal3f(norm.x, norm.y, norm.z);
 		}
-
+		for (auto v : { v3, v4, v1 }) {
+			glVertex3f(v.x, v.y, v.z);
+			auto& norm = mc.normals[2 * i + 1];
+			glNormal3f(norm.x, norm.y, norm.z);
+		}
 	}
 	glEnd();
 

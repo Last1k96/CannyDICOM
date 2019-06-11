@@ -22,20 +22,8 @@ public:
 	void normalize();
 	Vertex normal(Vertex v1, Vertex v2, Vertex v3);
 	void computeNormals();
-	DualMarchingCubes(std::vector<uint8_t> verts, int dimX, int dimY, int dimZ)
-	{
-		////simplify
-		//CGAL::random_simplify_point_set(verts, 0.20);
-		
-		//reconstruct
-		dualmc::DualMC<uint8_t> builder;
-		builder.build(&verts.front(), dimX, dimY, dimZ, 1.0f
-			, false, false, vertices, quads);
-
-		//normalize
-		normalize();
-		computeNormals();
-	}
+	DualMarchingCubes(std::vector<uint8_t> verts, int dimX, int dimY, int dimZ);
+	
 
 	std::vector<Vertex> vertices;
 	std::vector<Quad> quads;

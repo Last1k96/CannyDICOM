@@ -22,6 +22,21 @@ using std::chrono::high_resolution_clock;
 using std::chrono::duration;
 using std::chrono::duration_cast;
 
+DualMarchingCubes::DualMarchingCubes(std::vector<uint8_t> verts, int dimX, int dimY, int dimZ)
+{
+	////simplify
+	//CGAL::random_simplify_point_set(verts, 0.20);
+
+	//reconstruct
+	dualmc::DualMC<uint8_t> builder;
+	builder.build(&verts.front(), dimX, dimY, dimZ, 1.0f
+		, false, false, vertices, quads);
+
+	//normalize
+	normalize();
+	computeNormals();
+}
+
 Vertex DualMarchingCubes::normal(Vertex v1, Vertex v2, Vertex v3)
 {
 	const auto u = Vertex{ v2.x - v1.x, v2.y - v1.y, v2.z - v1.z };
@@ -38,11 +53,12 @@ Vertex DualMarchingCubes::normal(Vertex v1, Vertex v2, Vertex v3)
 void DualMarchingCubes::computeNormals()
 {
 	normals.clear();
-	normals.resize(quads.size());
+	normals.resize(quads.size() * 2);
 #pragma omp parallel for
 	for (int i = 0; i < quads.size(); i++)
 	{
-		normals[i] = normal(vertices[quads[i].i0], vertices[quads[i].i1], vertices[quads[i].i2]);
+		normals[2 * i] =	 normal(vertices[quads[i].i0], vertices[quads[i].i1], vertices[quads[i].i2]);
+		normals[2 * i + 1] = normal(vertices[quads[i].i2], vertices[quads[i].i3], vertices[quads[i].i1]);
 	}
 }
 

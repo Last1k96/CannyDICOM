@@ -4,14 +4,16 @@
 #include <utility>
 #include <cstring>
 
+
 QGLMeshViewer::QGLMeshViewer(QWidget* parent, std::vector<cv::Mat> const& images)
 {
 	auto const dimX = images[0].rows;
 	auto const dimY = images[0].cols / 2; // т.к. две склеенные картинки
 	auto const dimZ = images.size();
 
-	auto vertex = std::vector<Point>();
-	vertex.reserve(dimX * dimY * dimZ);
+	auto vertex = std::vector<uint8_t>(dimX * dimY * dimZ);
+	
+#pragma omp parallel for
 	for (auto z = 0; z < dimZ; ++z)
 	{
 		auto& image = images[z];
@@ -19,20 +21,18 @@ QGLMeshViewer::QGLMeshViewer(QWidget* parent, std::vector<cv::Mat> const& images
 		{
 			for (auto x = 0; x < dimX; ++x)
 			{
-				if (image.at<uint8_t>(y, x + dimY) > 0)
-					vertex.emplace_back(x, y, z);
+				vertex[z * dimX * dimY + y * dimX + x] = image.at<uint8_t>(y, x + dimY);
 			}
 		}
 	}
-	vertex.shrink_to_fit();
-	mesh = MeshReconstruction(std::move(vertex), dimX, dimY, dimZ);
+	mc = DualMarchingCubes(std::move(vertex), dimX, dimY, dimZ);
 }
 
 void QGLMeshViewer::draw()
 {
-	glColor3f(0.6, 0.2, 1.0);
+	glColor3f(0.8, 0.7, 0.65);
 
-	if (false)
+	if constexpr (false)
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
@@ -42,18 +42,39 @@ void QGLMeshViewer::draw()
 	}
 
 	glBegin(GL_TRIANGLES);
-	for (auto& f : faces(mesh.poly))
+	for (int i = 0; i < mc.quads.size(); ++i)
 	{
-		for (auto& v : CGAL::vertices_around_face(halfedge(f, mesh.poly), mesh.poly))
-		{
-			auto point = v->point();
-			glVertex3f(point.x(), point.y(), point.z());
-			auto normal = mesh.vnormals[v];
-			glNormal3f(normal.x(), normal.y(), normal.z());
-		}
-	}
+		auto& q = mc.quads[i];
+		auto& v1 = mc.vertices[q.i0];
+		auto& v2 = mc.vertices[q.i1];
+		auto& v3 = mc.vertices[q.i2];
+		auto& v4 = mc.vertices[q.i3];
 
+		for (auto v : { v1, v2, v3, v3, v4, v1 }) {
+			glVertex3f(v.x, v.y, v.z);
+			auto& norm = mc.normals[i];
+			glNormal3f(norm.x, norm.y, norm.z);
+		}
+
+	}
 	glEnd();
+
+	//	glBegin(GL_TRIANGLES);
+	//for (auto& f : faces(mesh.poly))
+	//{
+	//	for (auto& v : CGAL::vertices_around_face(halfedge(f, mesh.poly), mesh.poly))
+	//	{
+	//		count++;
+	//		auto& point = v->point();
+	//		glVertex3f(point.x(), point.y(), point.z());
+	//		//auto& normal = mesh.vnormals[v];
+	//		//glNormal3f(normal.x(), normal.y(), normal.z());
+	//		auto length = std::sqrt(point.x() * point.x() + point.y() * point.y() + point.z() * point.z());
+	//		glNormal3f(point.x() / length, point.y() / length, point.z() / length);
+	//	}
+	//}
+
+	//glEnd();
 }
 
 //quad 1 2 3 4

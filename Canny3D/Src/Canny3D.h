@@ -18,8 +18,7 @@ public:
 
 	void addNewTab(QTreeWidgetItem* item, int column) const;
 
-	void addNewTab3D(std::vector<cv::Mat> images, std::tuple<double, double, double> xyzInMillimeters,
-	                 QString const& tabName) const;
+	void addNewTab3D(std::vector<cv::Mat> images, QString const& tabName) const;
 	void updateTree(std::vector<ImebraImage>&& images);
 	void adjustColumns(QModelIndex const& index);
 	std::optional<std::vector<ImebraImage>> initiateOpenDialog(QString const& name, QFileDialog::FileMode type);

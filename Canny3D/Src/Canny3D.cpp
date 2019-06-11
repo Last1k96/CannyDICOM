@@ -136,14 +136,7 @@ void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 		// get size in mm
 		auto const& image = images[0].image;
 
-		auto sizeInMillimeters = std::tuple
-		{
-			image->getWidthMm() / image->getWidth(),
-			image->getHeightMm() / image->getHeight(),
-			std::fabs(images[0].tags.sliceLocation - images[1].tags.sliceLocation)
-		};
-
-		this->addNewTab3D(std::move(edges), sizeInMillimeters, tabName);
+		this->addNewTab3D(std::move(edges), tabName);
 	});
 	connect(settings, &CannySettings::settingsChanged, viewer, &DicomViewer::setSettings);
 	ui.tabWidget->addTab(tab, tabName);
@@ -162,7 +155,7 @@ void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 	settings->setUiValues(s);
 }
 
-void Canny3D::addNewTab3D(std::vector<cv::Mat> images, std::tuple<double, double, double> xyzInMillimeters, QString const& tabName) const
+void Canny3D::addNewTab3D(std::vector<cv::Mat> images, QString const& tabName) const
 {
 	auto tab = new QWidget();
 	auto widget = new QGLMeshViewer(tab, std::move(images));

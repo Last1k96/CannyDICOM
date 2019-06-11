@@ -67,7 +67,7 @@
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;d:\dev\CGAL\lib;d:\dev\CGAL-4.13\auxiliary\gmp\lib;d:\dev\libQGLViewer-2.7.1\QGLViewer;C:\tools\opencv\build\x64\vc15\lib;D:\Projects\DICOM\imebra\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>CGAL-vc140-mt-gd-4.13.lib;CGAL_Core-vc140-mt-gd-4.13.lib;CGAL_ImageIO-vc140-mt-gd-4.13.lib;CGAL_Qt5-vc140-mt-gd-4.13.lib;libgmp-10.lib;libmpfr-4.lib;QGLViewerd2.lib;opengl32.lib;glu32.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5OpenGLd.lib;Qt5Xmld.lib;opencv_world410d.lib;imebra.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libCGAL-vc140-mt-gd-4.13.lib;CGAL_Core-vc140-mt-gd-4.13.lib;CGAL_ImageIO-vc140-mt-gd-4.13.lib;CGAL_Qt5-vc140-mt-gd-4.13.lib;libgmp-10.lib;libmpfr-4.lib;QGLViewerd2.lib;opengl32.lib;glu32.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5OpenGLd.lib;Qt5Xmld.lib;opencv_world410d.lib;imebra.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <QtMoc>
       <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
@@ -127,6 +127,7 @@
     <ClCompile Include="Src\CannySettings.cpp" />
     <ClCompile Include="Src\DicomTreeItem.cpp" />
     <ClCompile Include="Src\Canny3D.cpp" />
+    <ClCompile Include="Src\DualMarchingCubes.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\QGLMeshViewer.cpp" />
     <ClCompile Include="Src\DicomViewer.cpp" />
@@ -155,6 +156,7 @@
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>
     </ClInclude>
+    <ClInclude Include="Src\DualMarchingCubes.h" />
     <ClInclude Include="Src\dualmc\dualmc.h" />
     <ClInclude Include="Src\MeshReconstruction.h" />
     <ClInclude Include="Src\Settings.h" />

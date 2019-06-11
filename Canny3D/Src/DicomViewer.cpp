@@ -47,14 +47,14 @@ void DicomViewer::setSettings(Settings const& s)
 	updateImage();
 }
 
-cv::Mat DicomViewer::computeImage(int index) const
+cv::Mat DicomViewer::computeImage(int index, bool forceCanny = false) const
 {
 	cv::Mat result;
 
 	auto const imebraImage = images[index];
 
 	auto const voilut = applyVoilutTransform(imebraImage, VOI{ settings.voiCenter, settings.voiWidth });
-	if (settings.step == Steps::VOI)
+	if (settings.step == Steps::VOI && !forceCanny)
 	{
 		auto const original = cv::Mat(applyVoilutTransform(imebraImage));
 		hconcat(original, voilut, result);
@@ -62,7 +62,7 @@ cv::Mat DicomViewer::computeImage(int index) const
 	}
 
 	auto const blured = gauss(voilut, settings.gaussKernel, settings.gaussSigma);
-	if (settings.step == Steps::Gauss)
+	if (settings.step == Steps::Gauss && !forceCanny)
 	{
 		hconcat(voilut, blured, result);
 		return result;

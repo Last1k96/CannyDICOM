@@ -127,7 +127,6 @@
     <ClCompile Include="Src\CannySettings.cpp" />
     <ClCompile Include="Src\DicomTreeItem.cpp" />
     <ClCompile Include="Src\Canny3D.cpp" />
-    <ClCompile Include="Src\DualMarchingCubes.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\QGLMeshViewer.cpp" />
     <ClCompile Include="Src\DicomViewer.cpp" />
@@ -157,7 +156,7 @@
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.;.\GeneratedFiles;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtXML;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;d:\dev\CGAL\include;d:\dev\CGAL-4.13\auxiliary\gmp\include;d:\dev\libQGLViewer-2.7.1;d:\dev\boost;C:\tools\opencv\build\include;D:\Projects\DICOM\imebra\include;$(NOINHERIT)</IncludePath>
     </ClInclude>
     <ClInclude Include="Src\dualmc\dualmc.h" />
-    <ClInclude Include="Src\DualMarchingCubes.h" />
+    <ClInclude Include="Src\MeshReconstruction.h" />
     <ClInclude Include="Src\Settings.h" />
     <ClInclude Include="Src\Utility.h" />
     <ClInclude Include="Src\QGLMeshViewer.h" />

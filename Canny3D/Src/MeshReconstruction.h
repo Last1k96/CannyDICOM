@@ -1,9 +1,4 @@
 #pragma once
-// Copyright (C) 2017, Dominik Wodniok
-// This software may be modified and distributed under the terms
-// of the BSD 3-Clause license.
-// See the LICENSE.txt file for details.
-
 #include <string>
 #include <vector>
 #include <CGAL/Polyhedron_3.h>
@@ -32,53 +27,36 @@ typedef CGAL::Sequential_tag Concurrency_tag;
 /// Example application for demonstrating the dual marching cubes builder.
 class MeshReconstruction
 {
-	std::map<face_descriptor, Vector> fnormals;
-	std::map<vertex_descriptor, Vector> vnormals;
 public:
 	MeshReconstruction() = default;
 	MeshReconstruction(MeshReconstruction const&) = default;
-	MeshReconstruction(MeshReconstruction &&) = default;
+	MeshReconstruction(MeshReconstruction&&) = default;
 	MeshReconstruction& operator=(MeshReconstruction const&) = default;
-	MeshReconstruction& operator=(MeshReconstruction &&) = default;
+	MeshReconstruction& operator=(MeshReconstruction&&) = default;
+	~MeshReconstruction() = default;
 
 	MeshReconstruction(std::vector<Point> vertices, int dimX, int dimY, int dimZ)
-	: dims{dimX, dimY, dimZ}, verts(std::move(vertices))
+		: dims{ dimX, dimY, dimZ }, verts(std::move(vertices))
 	{
 		//simplify
 		CGAL::random_simplify_point_set(verts, 20.0);
 		//reconstruct
-		Reconstruction reconstruct(vertices.begin(), vertices.end());
+		Reconstruction reconstruct(verts.begin(), verts.end());
 		reconstruct.increase_scale(4);
 		reconstruct.reconstruct_surface();
 		std::stringstream buf{};
 		buf << reconstruct;
-		buf >> mesh;
-		//normals
-		Polyhedron::Vertex_iterator v;
-		Polyhedron::Facet_iterator f;
-		Polyhedron::Edge_iterator eit;
-		Polyhedron::Halfedge_handle h_handle;
-		double x, y, z;
+		buf >> poly;
 
-		CGAL::Polygon_mesh_processing::compute_normals(P,
+		CGAL::Polygon_mesh_processing::compute_normals(poly,
 			boost::make_assoc_property_map(vnormals),
 			boost::make_assoc_property_map(fnormals));
-
-		glBegin(GL_TRIANGLES);
-		for (f = P.facets_begin(); f != P.facets_end(); f++) {
-			xx = fnormals[f].x() / sqrt((fnormals[f].x() * fnormals[f].x()) +
-				(fnormals[f].y() * fnormals[f].y()) + (fnormals[f].z() * fnormals[f].z()));
-			yy = fnormals[f].y() / sqrt((fnormals[f].x() * fnormals[f].x()) +
-				(fnormals[f].y() * fnormals[f].y()) + (fnormals[f].z() * fnormals[f].z()));
-			zz = fnormals[f].z() / sqrt((fnormals[f].x() * fnormals[f].x()) +
-				(fnormals[f].y() * fnormals[f].y()) + (fnormals[f].z() * fnormals[f].z()));
-			glNormal3f(xx, yy, zz);
-			gl_draw_facet(f);
-		}
-		glEnd();
 	}
 
+	std::map<face_descriptor, Vector> fnormals;
+	std::map<vertex_descriptor, Vector> vnormals;
 	Point dims;
 	std::vector<Point> verts;
-	Polyhedron mesh;
+	Polyhedron poly;
+
 };

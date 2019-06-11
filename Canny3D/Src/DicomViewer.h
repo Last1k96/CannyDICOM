@@ -13,13 +13,13 @@ class DicomViewer : public QLabel
 Q_OBJECT
 
 public:
-	explicit DicomViewer(QWidget* parent = Q_NULLPTR, std::vector<ImebraImage> && data = {});
-[[nodiscard]] size_t imageCount() const;
-[[nodiscard]] size_t index() const;
-[[nodiscard]] cv::Mat computeCurrentImage() const;
+	explicit DicomViewer(QWidget* parent = Q_NULLPTR, std::vector<ImebraImage>&& data = {});
+	[[nodiscard]] size_t imageCount() const;
+	[[nodiscard]] size_t index() const;
+	[[nodiscard]] cv::Mat computeCurrentImage() const;
 	std::vector<ImebraImage> const images{};
 
-private:	
+private:
 	size_t idx{};
 	void updateMargins();
 	cv::Mat currentImage;
@@ -32,16 +32,16 @@ public slots:
 	void setPixmap(const QPixmap& pm);
 	bool selectImage(int index);
 	void setSettings(Settings const& s);
-cv::Mat computeImage(int index) const;
+	cv::Mat computeImage(int index, bool forceCanny) const;
 
 signals:
-void imageChanged(int index);
+	void imageChanged(int index);
 
 protected:
-void resizeEvent(QResizeEvent* event) override;
+	void resizeEvent(QResizeEvent* event) override;
 
 private:
-bool eventFilter(QObject* obj, QEvent* event) override;
-void handleWheelEvent(QWheelEvent*);
-void updateImage();
+	bool eventFilter(QObject* obj, QEvent* event) override;
+	void handleWheelEvent(QWheelEvent*);
+	void updateImage();
 };

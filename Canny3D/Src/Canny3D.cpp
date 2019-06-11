@@ -130,7 +130,7 @@ void Canny3D::addNewTab(QTreeWidgetItem* item, int column) const
 #pragma omp parallel for
 		for (int i = 0; i < images.size(); i++)
 		{
-			edges[i] = viewer->computeImage(i);
+			edges[i] = viewer->computeImage(i, true);
 		}
 
 		// get size in mm

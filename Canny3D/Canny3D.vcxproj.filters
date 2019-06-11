@@ -51,9 +51,6 @@
     <ClCompile Include="ImageBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Src\DualMarchingCubes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="Qt\Canny3D.ui">
@@ -98,7 +95,7 @@
     <ClInclude Include="Src\dualmc\dualmc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Src\DualMarchingCubes.h">
+    <ClInclude Include="Src\MeshReconstruction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
